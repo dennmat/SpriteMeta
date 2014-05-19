@@ -5,7 +5,7 @@ A tool mainly for sectioning regions of a spritesheet into groups and individual
 
 Also there was a recent name change screenshots/code has yet to catch up!
 
-Techonologies Used
+Technologies Used
 ------------------
 1. [Node-Webkit](https://github.com/rogerwang/node-webkit). If you haven't checked it out yet you should. It makes desktop development bearable by combining nodejs and an embedded webkit allowing you to use html and css.
 2. [Traceur](https://github.com/google/traceur-compiler). Yay ecma6
