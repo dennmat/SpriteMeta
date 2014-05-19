@@ -30,9 +30,15 @@ npm install traceur
 
 How To Build
 ------------
+#### Windows
 
-*Windows* - assuming you have nodewebkit first get the dependencies then just run build.bat
-*Linux* - no build script yet, however shouldn't be hard to make can reuse node script for compiling traceur.
+Make sure nodewebkit is on your path
+
+Get the dependencies then just run `build.bat`.
+
+#### Linux
+
+No build script yet, however shouldn't be hard to make can reuse node script for compiling traceur.
 
 >*Note:* traceur builds into a directory 'c/' in the root of the project. Use these in requires. 
 
