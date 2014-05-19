@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Spriter!</title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link rel="stylesheet" type="text/css" href="media/css/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="media/css/bootstrap-theme.css" />
+		<link rel="stylesheet" type="text/css" href="media/css/font-awesome.min.css" />
+		<link rel="stylesheet" type="text/css" href="media/css/cover.css" />
+		<link rel="stylesheet" type="text/css" href="styles/editor.css" />
+		<style type="text/css">
+			#start-page {
+				text-align: center;
+			}
+			
+			.button {
+				border: 0 none;
+				border-radius: 2px 2px 2px 2px;
+				color: #FFFFFF;
+				cursor: pointer;
+				display: inline-block;
+				font-family: Arial,sans-serif;
+				font-size: 12px;
+				font-weight: bold;
+				line-height: 20px;
+				margin-bottom: 0;
+				margin-top: 10px;
+				padding: 7px 10px;
+				text-transform: none;
+				transition: all 0.3s ease 0s;
+				/*  width: 16.795%;*/
+				/* auto */
+				text-align: center;
+				/* DELETE WHEN WIDTH AUTO */
+			}
+
+			.button i {
+				margin: 0 5px;
+			}
+
+			.button.red {
+				background: none repeat scroll 0 0 #e0645c;
+				color: white;
+			}
+			.button.red:hover {
+				background: none repeat scroll 0 0 #999999;
+				color: white;
+			}
+			.button.dark {
+				background: none repeat scroll 0 0 #444444;
+				color: white;
+			}
+			.button.dark:hover {
+				background: none repeat scroll 0 0 #2db6cf;
+				color: white;
+			}
+			.button.light {
+				background: none repeat scroll 0 0 #999999;
+				color: white;
+			}
+			.button.light:hover {
+				background: none repeat scroll 0 0 #444444;
+				color: white;
+			}
+			.button.green {
+				background: none repeat scroll 0 0 #46b98a;
+				color: white;
+			}
+			.button.green:hover {
+				background: none repeat scroll 0 0 #444444;
+				color: white;
+			}
+			.button.blue {
+				background: none repeat scroll 0 0 #2db6cf;
+				color: white;
+			}
+			.button.blue:hover {
+				background: none repeat scroll 0 0 #444444;
+				color: white;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="site-wrapper">
+
+			<div class="site-wrapper-inner">
+
+				<div class="cover-container">
+
+					<div class="masthead clearfix">
+						<div class="inner">
+							<h3 class="masthead-brand">Spriter</h3>
+							<ul class="nav masthead-nav" id="tabs">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="inner cover" id="view">
+					<div class="tab-views">
+
+					</div>
+				</div>
+
+				<div class="mastfoot">
+					<div class="inner">
+						<p>Spriter 2014 - Matthew Dennis</p>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+		<input style="display: none;" id="fileDialog" type="file" accept=".sprtr" />
+		<input style="display: none;" id="saveFileDialog" type="file" nwsaveas accept=".sprtr" />
+		<script type="text/javascript" src="media/js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="media/js/bootstrap.js"></script>
+		<script type="text/javascript">
+			var traceurRuntimePath = require("traceur").RUNTIME_PATH;
+			var traceurRuntime = require(traceurRuntimePath)
+		</script>
+		<script type="text/javascript" src="c/main.js"></script>
+	</body>
+</html>

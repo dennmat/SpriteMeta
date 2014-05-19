@@ -1,0 +1,9 @@
+{
+	"name": "Spriter",
+	"main": "main.html",
+	"window": {
+		"toolbar": false,
+		"width": 1024,
+		"height": 768
+	}
+}

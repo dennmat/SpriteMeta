@@ -1,0 +1,82 @@
+#editor {
+	position: relative;
+}
+
+#editor .group-box,
+#editor .selection {
+	background: rgba(150, 150, 255, .4);
+	min-width: 1px;
+	min-height: 1px;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	
+	z-index: 100;
+	
+	border: 3px solid rgba(150, 150, 255, 1);
+}
+
+#editor .group-box {
+	border-color: rgba(150, 255, 150, 1);
+	background: rgba(150, 255, 150, .3);
+}
+
+
+#editor .left-pane {
+	box-sizing: border-box;
+	float: left;
+	width: 15%;
+	background: #111;
+	min-height: 850px;
+	max-height: 850px;
+}
+
+#editor .right-pane {
+	box-sizing: border-box;
+	float: left;
+	width: 85%;
+	background: #CCC;
+	min-height: 850px;
+	max-height: 850px;
+	overflow: auto;
+	position: relative;
+}
+
+#editor .image-holder img {
+	border-left: 1px dashed #aaa;
+	border-right: 1px dashed #aaa;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#editor .blank {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	-webkit-transform: translate(-50%, -50%);
+}
+
+#editor .status-bar table {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#editor .status-bar .left-side {
+	
+}
+
+#editor .status-bar .right-side {
+	
+}
+
+#editor .tools-container a {
+	display: inline-block;
+}
+
+#editor .tools-container a.disabled {
+	cursor: default;
+	opacity: 0.4;
+}
