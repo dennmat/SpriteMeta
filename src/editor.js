@@ -72,6 +72,11 @@ class Editor {
 		return this.element.find('.right-pane');
 	}
 
+	removeSelection() {
+		this.selection.destroy();
+		this.selection = null;
+	}
+
 	handleDrag(e) {
 		var wasDragged = this.dragging;
 		this.dragging = false;

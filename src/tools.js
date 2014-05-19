@@ -57,7 +57,7 @@ class GroupTool extends Tool {
 
 		project.addGroup(group);
 
-		selection.destroy();
+		editor.removeSelection();
 	}
 
 	requiresSelection() { return true; }

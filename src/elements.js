@@ -89,6 +89,15 @@ class Selection extends Focusable {
 		});
 	}
 
+	inBounds(x, y) {
+		var pointRect = new Utils.Rect(x, y, 1, 1);
+		return pointRect.hasIntersect(this.pos);
+	}
+
+	keyUpEvent() {}
+	keyDownEvent() {}
+	mouseMoveEvent() {}
+
 	destroy() {
 		this.element.remove();
 		this.pos = null;
@@ -104,7 +113,7 @@ class Element {
 	serialize() {}
 }
 
-class Sprite extends Element {
+class Sprite extends (Element, Focusable) {
 	constructor(editor, info) {
 		this.editor = editor;
 		this.rect = new Utils.Rect();
@@ -125,6 +134,15 @@ class Sprite extends Element {
 	serialize() {
 
 	}
+
+	inBounds(x, y) {
+		var pointRect = new Utils.Rect(x, y, 1, 1);
+		return pointRect.hasIntersect(this.rect);
+	}
+
+	keyUpEvent() {}
+	keyDownEvent() {}
+	mouseMoveEvent() {}
 }
 
 Sprite.boxTemplate = `
@@ -183,6 +201,15 @@ class Group extends (Element, Focusable) {
 			sprites: this.sprites
 		}
 	}
+
+	inBounds(x, y) {
+		var pointRect = new Utils.Rect(x, y, 1, 1);
+		return pointRect.hasIntersect(this.rect);
+	}
+
+	keyUpEvent() {}
+	keyDownEvent() {}
+	mouseMoveEvent() {}
 }
 
 Group.boxTemplate = `
