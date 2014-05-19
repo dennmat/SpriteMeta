@@ -1,6 +1,6 @@
 {
 	"name": "Spritzup",
-	"main": "main.html",
+	"main": "views/main.html",
 	"window": {
 		"toolbar": false,
 		"width": 1024,

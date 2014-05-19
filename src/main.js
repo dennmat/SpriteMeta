@@ -3,8 +3,8 @@ var $traceurRuntime = global.$traceurRuntime;
 
 var ngui = require('nw.gui');
 
-var Editor = require('./c/editor.js');
-var TabManager = require('./c/tabs.js');
+var Editor = require('../c/editor.js');
+var TabManager = require('../c/tabs.js');
 
 class Main {
 	constructor() {
@@ -24,7 +24,6 @@ class Main {
 		this.editor = new Editor($('.tab-views'), this.tab_manager);
 
 		this.tab_manager.addTab('startpage.html', 'start', 'Start');
-		//this.tab_manager.addTab('editor.html', 'editor1', 'Test.sprtr', true);
 	}
 }
 
