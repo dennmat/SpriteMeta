@@ -3,6 +3,8 @@ spritzup
 
 A tool mainly for sectioning regions of a spritesheet into groups and individual sprites and exporting to a useable format.
 
+Also there was a recent name change screenshots/code has yet to catch up!
+
 Techonologies Used
 ------------------
 1. [Node-Webkit](https://github.com/rogerwang/node-webkit). If you haven't checked it out yet you should. It makes desktop development bearable by combining nodejs and an embedded webkit allowing you to use html and css.
@@ -21,7 +23,7 @@ Mustache - Template engine
 npm install mustache
 ```
 
-traceur - ECMA5 to ECMA 5 compiler
+traceur - ECMA 6 to ECMA 5 compiler
 ```bash
 npm install traceur
 ```
@@ -36,9 +38,17 @@ How To Build
 
 Current Status
 --------------
+
 Working on:
--Implementing the group/sprite selection tools/functionality.
--Implementing a method of scaling the selections with the editor.
--Grid selection, will build a grid of specified dimensions and create sprites out of the cells.
--Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.
--Proper saving/export.
+
+*Implementing the group/sprite selection tools/functionality.
+*Implementing a method of scaling the selections with the editor.
+*Grid selection, will build a grid of specified dimensions and create sprites out of the cells.
+*Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.
+*Proper saving/export.
+
+
+Screenshots
+-----------
+![First Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/main-5-19-2014.png "Main Screen")
+![Editor Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-5-19-2014.png "Editor Screen")
