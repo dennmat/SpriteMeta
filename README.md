@@ -9,7 +9,7 @@ Techonologies Used
 ------------------
 1. [Node-Webkit](https://github.com/rogerwang/node-webkit). If you haven't checked it out yet you should. It makes desktop development bearable by combining nodejs and an embedded webkit allowing you to use html and css.
 2. [Traceur](https://github.com/google/traceur-compiler). Yay ecma6
-3.(Sort of relevant here) Bootstrap, started with the Cover theme from their examples page.
+3. (Sort of relevant here) Bootstrap, started with the Cover theme from their examples page.
 
 ### Apologies
 Currently the mix of _ and camels is a little hectic I'll get to cleaning up once I have this thing actually doing some useful stuff.
