@@ -41,11 +41,11 @@ Current Status
 
 Working on:
 
-*Implementing the group/sprite selection tools/functionality.
-*Implementing a method of scaling the selections with the editor.
-*Grid selection, will build a grid of specified dimensions and create sprites out of the cells.
-*Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.
-*Proper saving/export.
+* Implementing the group/sprite selection tools/functionality.
+* Implementing a method of scaling the selections with the editor.
+* Grid selection, will build a grid of specified dimensions and create sprites out of the cells.
+* Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.
+* Proper saving/export.
 
 
 Screenshots
