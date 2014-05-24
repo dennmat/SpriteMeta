@@ -31,6 +31,27 @@ class Project {
 		};
 	}
 
+	setImagePosition(x, y) {
+		this.editorInfo.pos.x = x;
+		this.editorInfo.pos.y = y;
+	}
+
+	getImagePosition() {
+		return this.editorInfo.pos;
+	}
+
+	relativePosToImagePos(x, y) {
+		var relative = this.editor.image_element.position();
+
+		return new Utils.Rect(x - relative.left, y - relative.top);
+	}
+
+	imagePosToRelativePos(x, y) {
+		var relative = this.editor.image_element.position();
+
+		return new Utils.Rect(x + relative.left, y + relative.top);
+	}
+
 	markDirty(val) {
 		this.dirty = val;
 		this.editor.updateDirty(this.id);
@@ -38,6 +59,12 @@ class Project {
 
 	setDimensions(rect) {
 		this.baseDimensions = rect;
+	}
+
+	update() {
+		for (var groupKey in this.groups) {
+			this.groups[groupKey].reposition();
+		}
 	}
 
 	addGroup(group) {

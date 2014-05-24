@@ -51,8 +51,15 @@ class GroupTool extends Tool {
 		var selection = editor.selection;
 		var project = editor.active_project;
 
+		/*var image_position = project.relativePosToImagePos(selection.pos.x, selection.pos.y);
+		image_position.w = selection.pos.w;
+		image_position.h = selection.pos.h;
+
+		//adjust for zoom
+		image_position.removeZoom(editor.zoom);*/
+
 		var group = new Elements.Group(editor, {
-			rect: selection.pos
+			rect: selection.pos.copy()
 		});
 
 		project.addGroup(group);

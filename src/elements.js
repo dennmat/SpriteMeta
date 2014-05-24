@@ -71,22 +71,39 @@ class Selection extends Focusable {
 
 	build() {
 		this.element = $(Mustache.to_html(Selection.template));
-		this.element.css({
-			left: this.pos.x,
-			top: this.pos.y
-		});
+		
+		this.reposition();
 
 		this.editor.getEditorContainer().append(this.element);
 	}
 
-	update(w, h) {
-		this.pos.w = w;
-		this.pos.h = h;
+	/*move(deltaX, deltaY) {
+		this.pos.x += deltaX;
+		this.pos.y += deltaY;
 
-		this.element.css({
-			width: w,
-			height: h
-		});
+		this.update();
+	}*/
+
+	reposition() {
+		var screen_pos = this.pos.copy();
+		screen_pos.adjustToZoom(this.editor.zoom);
+
+		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		adjusted_pos.w = screen_pos.w;
+		adjusted_pos.h = screen_pos.h;
+
+		this.element.css(adjusted_pos.toCss());
+	}
+
+	setDimensions(w, h) {
+		var tempRect = new Utils.Rect(this.pos.x, this.pos.y, w, h);
+		tempRect.removeZoom(this.editor.zoom);
+
+		this.pos = tempRect;
+
+		//console.log("SETTING DIMENSIONS", w, h, this.pos);
+
+		this.reposition();
 	}
 
 	inBounds(x, y) {
@@ -124,7 +141,14 @@ class Sprite extends (Element, Focusable) {
 	}
 
 	reposition() {
+		var screen_pos = this.rect.copy();
+		screen_pos.adjustToZoom(this.editor.zoom);
 
+		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		adjusted_pos.w = screen_pos.w;
+		adjusted_pos.h = screen_pos.h;
+
+		this.element.css(adjusted_pos.toCss());
 	}
 
 	load(info) {
@@ -181,13 +205,26 @@ class Group extends (Element, Focusable) {
 
 		this.element = $(Mustache.to_html(Group.boxTemplate, {}));
 
-		this.element.css(this.rect.toCss());
+		/*var screen_pos = this.editor.active_project.imagePosToRelativePos(this.rect.x, this.rect.y);
+		screen_pos.w = this.rect.w;
+		screen_pos.h = this.rect.h;
+
+
+		this.element.css(screen_pos.toCss());*/
+		this.reposition();
 
 		container.append(this.element);
 	}
 
 	reposition() {
+		var screen_pos = this.rect.copy();
+		screen_pos.adjustToZoom(this.editor.zoom);
 
+		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		adjusted_pos.w = screen_pos.w;
+		adjusted_pos.h = screen_pos.h;
+
+		this.element.css(adjusted_pos.toCss());		
 	}
 
 	load(info) {

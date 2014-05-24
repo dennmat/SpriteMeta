@@ -28,8 +28,6 @@ class Editor {
 
 		this.element = null;
 		this.build();
-
-		this.delegate();
 	}
 
 	build() {
@@ -50,6 +48,8 @@ class Editor {
 			this.container.append(this.element);
 
 			this.updateStatus();
+
+			this.delegate();
 		});
 	}
 
@@ -75,6 +75,8 @@ class Editor {
 	removeSelection() {
 		this.selection.destroy();
 		this.selection = null;
+
+		this.tools.disableSelectionTools();
 	}
 
 	handleDrag(e) {
@@ -87,18 +89,14 @@ class Editor {
 			return;
 		}
 
-		var img_ele = this.image_element;
-		var img_holder = this.image_holder;
+		var deltaX = (e.pageX - this.dragInfo.x);
+		var deltaY = (e.pageY - this.dragInfo.y);
 
-		var delta_x = (e.pageX - this.dragInfo.x);
-		var delta_y = (e.pageY - this.dragInfo.y);
-
-		var current_pos = img_ele.position();
+		var current_pos = this.image_element.position();
 		
-		this.active_project.editorInfo.pos.x = current_pos.left + delta_x;
-		this.active_project.editorInfo.pos.y = current_pos.top + delta_y;
+		this.active_project.setImagePosition(current_pos.left + deltaX, current_pos.top + deltaY);
 
-		this.setPos();
+		this.setPos(deltaX, deltaY);
 
 		this.dragInfo = null;
 	}
@@ -118,7 +116,7 @@ class Editor {
 		var w = (e.pageX - relative.left) - this.selectionRegion.x;
 		var h = (e.pageY - relative.top) - this.selectionRegion.y;
 
-		this.selection.update(w, h);
+		this.selection.setDimensions(w, h);
 
 		this.selectionRegion = null;
 		this.selectionMade();
@@ -175,10 +173,17 @@ class Editor {
 						var w = (we.pageX - relative.left) - this.selectionRegion.x;
 						var h = (we.pageY - relative.top) - this.selectionRegion.y;
 
-						this.selection.update(w, h);
+						this.selection.setDimensions(w, h);
 					} else {
 						this.selecting = true;
-						this.selectionRegion = new Utils.Rect(e.pageX - relative.left, e.pageY - relative.top);
+						var region = new Utils.Rect(e.pageX - relative.left, e.pageY - relative.top);
+
+						var adjustedPos = this.active_project.relativePosToImagePos(region.x, region.y);
+						adjustedPos.w = region.w;
+						adjustedPos.h = region.h;
+
+						this.selectionRegion = adjustedPos;
+						
 						this.selection = new Elements.Selection(this, this.selectionRegion);
 					}
 				});
@@ -196,8 +201,7 @@ class Editor {
 			}
 
 		});
-			
-
+		
 		this.element.on('mousewheel', '.right-pane', e => {
 			if (!e.altKey) {
 				return true;
@@ -210,6 +214,8 @@ class Editor {
 
 			this.scrollInterval = setInterval(() => { //We don't want to fire this 20x for one physical scroll
 				var wd = e.originalEvent.wheelDelta;
+
+				var currentZoom = this.zoom;
 
 				if (wd < 0) { //Down
 					this.zoom -= Math.abs(wd)/500;
@@ -227,7 +233,7 @@ class Editor {
 
 				this.active_project.editorInfo.zoom = this.zoom;
 
-				this.setZoom();
+				this.setZoom(currentZoom);
 				
 				clearInterval(this.scrollInterval);
 				this.updateStatus();
@@ -250,32 +256,51 @@ class Editor {
 			});
 		});
 
-		this.element.on('load', '.image-holder img', e=> { //Refresh image data
-			if (this.active_project !== null) {
-				this.active_project.setDimensions(
-					new Utils.Rect(
-						0, 0, 
-						this.image_element.width(), 
-						this.image_element.height()
-					)
-				);
-			}
-		});
 	}
 
-	setPos() {
+	loadedImage() {
+		if (this.active_project !== null) {
+			this.active_project.setDimensions(
+				new Utils.Rect(
+					0, 0, 
+					this.image_element[0].naturalWidth, 
+					this.image_element[0].naturalHeight
+				)
+			);
+		}
+	}
+
+	setPos(deltaX, deltaY) {
 		var info = this.active_project.editorInfo;
 
 		this.image_element.css({
-			'left': info.pos.x.toString() + 'px',
-			'top': info.pos.y.toString() + 'px'
+			left: info.pos.x.toString() + 'px',
+			top: info.pos.y.toString() + 'px'
 		});
+
+		if (this.selection !== null) {
+			this.selection.reposition();
+		}
+
+		this.active_project.update();
 	}
 
-	setZoom() {
+	setZoom(previousZoom) {
 		var info = this.active_project.editorInfo;
 
-		this.image_element.css('width', parseInt(info.zoom * 100).toString() + '%');
+		var newWidth = this.active_project.baseDimensions.w * info.zoom;
+		var newHeight = this.active_project.baseDimensions.h * info.zoom;
+
+		this.image_element.css({
+			width: newWidth.toString() + 'px',
+			height: newHeight.toString() + 'px'
+		});
+
+		if (this.selection !== null) { //Temporary
+			this.selection.reposition();
+		}
+
+		this.active_project.update();
 	}
 
 	reload() {
@@ -317,8 +342,16 @@ class Editor {
 
 	resetImage() {
 		console.log("Reseting image to... ", this.active_project.path);
-		this.image_element.attr('src', this.active_project.path);
-			
+		var newImg = $('<img>').one("load", e => {
+			this.loadedImage();
+		}).attr('src', this.active_project.path);
+
+		this.image_element.remove();
+		this.image_element = null;
+
+		this.image_element = newImg;
+		this.image_element.appendTo(this.image_holder);
+
 		this.image_holder.show();
 		this.blank_element.hide();
 	}

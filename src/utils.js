@@ -34,6 +34,20 @@ class Rect {
 		);
 	}
 
+	removeZoom(zoom) {
+		this.x /= parseFloat(zoom);
+		this.y /= parseFloat(zoom);
+		this.w /= parseFloat(zoom);
+		this.h /= parseFloat(zoom);
+	}
+
+	adjustToZoom(zoom) {
+		this.x *= parseFloat(zoom);
+		this.y *= parseFloat(zoom);
+		this.w *= parseFloat(zoom);
+		this.h *= parseFloat(zoom);
+	}
+
 	toCss() {
 		console.log(this);
 		return {
@@ -42,6 +56,10 @@ class Rect {
 			width: this.w.toString() + 'px',
 			height: this.h.toString() + 'px'
 		};
+	}
+
+	copy() {
+		return new Rect(this.x, this.y, this.w, this.h);
 	}
 }
 
