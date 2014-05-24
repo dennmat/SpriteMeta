@@ -26,6 +26,8 @@ class Editor {
 
 		this.tools = new Tools();
 
+		this.focusedElement = null;
+
 		this.element = null;
 		this.build();
 	}
@@ -113,8 +115,16 @@ class Editor {
 
 		var relative = this.getEditorContainer().offset();
 
-		var w = (e.pageX - relative.left) - this.selectionRegion.x;
-		var h = (e.pageY - relative.top) - this.selectionRegion.y;
+		var adjustedRegion = this.selectionRegion.copy();
+		adjustedRegion.adjustToZoom(this.zoom);
+
+		var adjustedPos = this.active_project.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
+		adjustedPos.w = adjustedRegion.w;
+		adjustedPos.h = adjustedRegion.h;
+
+
+		var w = (e.pageX - relative.left) - adjustedPos.x;
+		var h = (e.pageY - relative.top) - adjustedPos.y;
 
 		this.selection.setDimensions(w, h);
 
@@ -124,6 +134,29 @@ class Editor {
 
 	selectionMade() {
 		this.tools.enableSelectionTools();
+	}
+
+	focus(element) {
+		if (this.focusedElement !== null) {
+			this.focusedElement.blur()
+		}
+
+		this.focusedElement = element;
+		this.focusedElement.receiveFocus();
+
+		this.setOptions();
+	}
+
+	clearOptions() {
+		this.element.find('.tool-options').empty();
+	}
+
+	setOptions() {
+		if (this.focusedElement === null) {
+			return;
+		}
+
+		this.element.find('.tool-options').append(this.focusedElement.renderOptions());
 	}
 
 	delegate() {
@@ -170,8 +203,15 @@ class Editor {
 					var relative = this.getEditorContainer().offset();
 					
 					if (this.selecting) {
-						var w = (we.pageX - relative.left) - this.selectionRegion.x;
-						var h = (we.pageY - relative.top) - this.selectionRegion.y;
+						var adjustedRegion = this.selectionRegion.copy();
+						adjustedRegion.adjustToZoom(this.zoom);
+
+						var adjustedPos = this.active_project.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
+						adjustedPos.w = adjustedRegion.w;
+						adjustedPos.h = adjustedRegion.h;
+
+						var w = (we.pageX - relative.left) - adjustedPos.x;
+						var h = (we.pageY - relative.top) - adjustedPos.y;
 
 						this.selection.setDimensions(w, h);
 					} else {
@@ -181,6 +221,8 @@ class Editor {
 						var adjustedPos = this.active_project.relativePosToImagePos(region.x, region.y);
 						adjustedPos.w = region.w;
 						adjustedPos.h = region.h;
+
+						adjustedPos.removeZoom(this.zoom);
 
 						this.selectionRegion = adjustedPos;
 						
@@ -341,7 +383,6 @@ class Editor {
 	}
 
 	resetImage() {
-		console.log("Reseting image to... ", this.active_project.path);
 		var newImg = $('<img>').one("load", e => {
 			this.loadedImage();
 		}).attr('src', this.active_project.path);

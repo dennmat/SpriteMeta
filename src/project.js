@@ -41,15 +41,15 @@ class Project {
 	}
 
 	relativePosToImagePos(x, y) {
-		var relative = this.editor.image_element.position();
+		var relative = this.getImagePosition();
 
-		return new Utils.Rect(x - relative.left, y - relative.top);
+		return new Utils.Rect(x - relative.x, y - relative.y);
 	}
 
 	imagePosToRelativePos(x, y) {
-		var relative = this.editor.image_element.position();
+		var relative = this.getImagePosition();//this.editor.image_element.position();
 
-		return new Utils.Rect(x + relative.left, y + relative.top);
+		return new Utils.Rect(x + relative.x, y + relative.y);
 	}
 
 	markDirty(val) {

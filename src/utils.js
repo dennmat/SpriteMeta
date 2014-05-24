@@ -48,8 +48,21 @@ class Rect {
 		this.h *= parseFloat(zoom);
 	}
 
+	add(otherRect) {
+		this.x += otherRect.x;
+		this.y += otherRect.y;
+		this.w += otherRect.w;
+		this.h += otherRect.h;
+	}
+
+	substract(otherRect) {
+		this.x -= otherRect.x;
+		this.y -= otherRect.y;
+		this.w -= otherRect.w;
+		this.h -= otherRect.h;
+	}
+
 	toCss() {
-		console.log(this);
 		return {
 			left: this.x.toString() + 'px',
 			top: this.y.toString() + 'px',

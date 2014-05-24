@@ -33,6 +33,8 @@ class Focusable {
 
 	inBounds(x, y) {} //Determine if a mouse click lands within the element and should receive focus
 
+	renderOptions() {}
+
 	acceptEvent(type, event) {
 		switch(type) {
 			case Focusable.KeyDownEvent:
@@ -85,14 +87,16 @@ class Selection extends Focusable {
 	}*/
 
 	reposition() {
-		var screen_pos = this.pos.copy();
-		screen_pos.adjustToZoom(this.editor.zoom);
+		var screenPos = this.pos.copy();
+		screenPos.adjustToZoom(this.editor.zoom);
 
-		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
-		adjusted_pos.w = screen_pos.w;
-		adjusted_pos.h = screen_pos.h;
+		var adjustedPos = this.editor.active_project.imagePosToRelativePos(screenPos.x, screenPos.y);
+		adjustedPos.w = screenPos.w;
+		adjustedPos.h = screenPos.h;
 
-		this.element.css(adjusted_pos.toCss());
+		var imagePosition = this.editor.active_project.getImagePosition();
+
+		this.element.css(adjustedPos.toCss());
 	}
 
 	setDimensions(w, h) {
@@ -110,6 +114,8 @@ class Selection extends Focusable {
 		var pointRect = new Utils.Rect(x, y, 1, 1);
 		return pointRect.hasIntersect(this.pos);
 	}
+
+	renderOptions() {}
 
 	keyUpEvent() {}
 	keyDownEvent() {}
@@ -163,6 +169,8 @@ class Sprite extends (Element, Focusable) {
 		var pointRect = new Utils.Rect(x, y, 1, 1);
 		return pointRect.hasIntersect(this.rect);
 	}
+
+	renderOptions() {}
 
 	keyUpEvent() {}
 	keyDownEvent() {}
@@ -244,6 +252,11 @@ class Group extends (Element, Focusable) {
 		return pointRect.hasIntersect(this.rect);
 	}
 
+	renderOptions() {
+		Group.updateOptions(this);
+		return Group.getOptionsElement();
+	}
+
 	keyUpEvent() {}
 	keyDownEvent() {}
 	mouseMoveEvent() {}
@@ -252,6 +265,54 @@ class Group extends (Element, Focusable) {
 Group.boxTemplate = `
 	<div class="group-box"></div>
 `;
+
+Group.optionsHtml = `
+	<table>
+		<tr>
+			<td><input type="text" name="group-name" placeholder="Group Name" /></td>
+		</tr>
+	</table>
+`;
+Group.optionsElement = null;
+Group.boundGroup = null;
+
+Group.getOptionsElement = function() {
+	if (Group.optionsElement === null) {
+		Group.optionsElement = $(Group.optionsHtml);
+		Group.delegate();
+	}
+
+	return Group.optionsElement;
+};
+
+Group.bindTo = function(group) {
+	Group.boundGroup = group;
+};
+
+Group.delegate = function() {
+	var container = Group.optionsElement;
+
+	container.on('change', 'input[name="group-name"]', e => {
+		var newVal = $(e.target).val();
+		if (newVal.trim().length == 0) {
+			//to do Utils.Alert
+			console.log('ENTER A VALID NAME!');
+			$(e.target).focus();
+		}
+
+		Group.boundGroup.name = newVal.trim();
+	});
+};
+
+Group.updateOptions = function(group) {
+	if (Group.optionsElement === null) {
+		Group.getOptionsElement();
+	}
+	
+	Group.optionsElement.find('input[name="group-name"]').val(group.name);
+
+	Group.bindTo(group);
+};
 
 module.exports = {
 	Sprite: Sprite,

@@ -74,9 +74,28 @@
 
 #editor .tools-container a {
 	display: inline-block;
+	margin: 0 5px;
 }
 
 #editor .tools-container a.disabled {
 	cursor: default;
 	opacity: 0.4;
+}
+
+#editor .tool-options table {
+	width: 100%;
+}
+
+#editor .tool-options {
+	padding: 5px 10px;
+}
+
+#editor .tool-options input {
+	color: #FAFAFA;
+	border: 1px solid #222;
+	background: #444;
+	padding: 5px;
+	width: 100%;
+	text-align: center;
+	display: block;
 }
