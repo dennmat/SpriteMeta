@@ -160,6 +160,17 @@ class Editor {
 	}
 
 	delegate() {
+		$(window).on('keyup', e => {
+			if (this.focusedElement === null) {
+				return true;
+			}
+			
+			if (this.focusedElement.keyUpEvent(e)) {
+				e.preventDefault();
+				return false;
+			}
+		});
+
 		this.element.on('click', '.tools-container a', e => {
 			e.preventDefault();
 

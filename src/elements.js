@@ -257,7 +257,46 @@ class Group extends (Element, Focusable) {
 		return Group.getOptionsElement();
 	}
 
-	keyUpEvent() {}
+	keyUpEvent(e) {
+		var dirty = false;
+
+		if (e.which === Utils.KeyCodes.UP) {
+			if (e.shiftKey) {
+				this.rect.h -= 1;
+			} else {
+				this.rect.y -= 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.DOWN) {
+			if (e.shiftKey) {
+				this.rect.h += 1;
+			} else {
+				this.rect.y += 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.LEFT) {
+			if (e.shiftKey) {
+				this.rect.w -= 1;
+			} else {
+				this.rect.x -= 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.RIGHT) {
+			if (e.shiftKey) {
+				this.rect.w += 1;
+			} else {
+				this.rect.x += 1;
+			}
+			dirty = true;
+		}
+
+		if (dirty) {
+			this.reposition();
+		}
+
+		return dirty;
+	}
+
 	keyDownEvent() {}
 	mouseMoveEvent() {}
 }
