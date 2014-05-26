@@ -14,7 +14,7 @@
 	
 	z-index: 100;
 	
-	border: 3px solid rgba(150, 150, 255, 1);
+	border: 1px solid rgba(150, 150, 255, 1);
 }
 
 #editor .group-box {
@@ -98,4 +98,10 @@
 	width: 100%;
 	text-align: center;
 	display: block;
+}
+
+#editor .left-pane .section-label {
+	margin: 15px 0 0 10px;
+	font-size: 14px;
+	font-weight: bold;
 }

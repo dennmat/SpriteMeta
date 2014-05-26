@@ -42,7 +42,7 @@ class Project {
 
 	relativePosToImagePos(x, y) {
 		var relative = this.getImagePosition();
-
+		
 		return new Utils.Rect(x - relative.x, y - relative.y);
 	}
 

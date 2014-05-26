@@ -52,7 +52,7 @@ class GroupTool extends Tool {
 		var project = editor.active_project;
 
 		var group = new Elements.Group(editor, {
-			rect: selection.pos.copy()
+			rect: selection.rect.copy()
 		});
 
 		project.addGroup(group);

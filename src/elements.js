@@ -61,12 +61,14 @@ class Selection extends Focusable {
 
 		this.editor = editor;
 
-		this.pos = (rect !== undefined)? rect : new Utils.Rect();
+		this.rect = (rect !== undefined)? rect : new Utils.Rect();
 
 		this.element = null;
 
 		//Focusable
 		this.hasFocus = false;
+
+		this.selectionMode = Selection.Modes.None;
 
 		this.build();
 	}
@@ -80,14 +82,14 @@ class Selection extends Focusable {
 	}
 
 	/*move(deltaX, deltaY) {
-		this.pos.x += deltaX;
-		this.pos.y += deltaY;
+		this.rect.x += deltaX;
+		this.rect.y += deltaY;
 
 		this.update();
 	}*/
 
 	reposition() {
-		var screenPos = this.pos.copy();
+		var screenPos = this.rect.copy();
 		screenPos.adjustToZoom(this.editor.zoom);
 
 		var adjustedPos = this.editor.active_project.imagePosToRelativePos(screenPos.x, screenPos.y);
@@ -100,24 +102,97 @@ class Selection extends Focusable {
 	}
 
 	setDimensions(w, h) {
-		var tempRect = new Utils.Rect(this.pos.x, this.pos.y, w, h);
+		var tempRect = new Utils.Rect(this.rect.x, this.rect.y, w, h);
 		tempRect.removeZoom(this.editor.zoom);
 
-		this.pos = tempRect;
+		this.rect = tempRect;
 
-		//console.log("SETTING DIMENSIONS", w, h, this.pos);
+		//console.log("SETTING DIMENSIONS", w, h, this.rect);
 
 		this.reposition();
 	}
 
-	inBounds(x, y) {
-		var pointRect = new Utils.Rect(x, y, 1, 1);
-		return pointRect.hasIntersect(this.pos);
+	initGridMode() {
+
 	}
 
-	renderOptions() {}
+	initAutoMode() {
 
-	keyUpEvent() {}
+	}
+
+	initSideMode() {
+
+	}
+
+	keyUpEventGrid(dir, shiftDown) {
+
+	}
+
+	keyUpEventAuto(dir, shiftDown) {
+
+	}
+
+	keyUpEventSide(dir, shiftDown) {
+
+	}
+
+	keyUpEventNone(dir, shiftDown) {
+		var dirty = false;
+
+		if (dir === Utils.KeyCodes.UP) {
+			if (shiftDown) {
+				this.rect.h -= 1;
+			} else {
+				this.rect.y -= 1;
+			}
+			dirty = true;
+		} else if (dir === Utils.KeyCodes.DOWN) {
+			if (shiftDown) {
+				this.rect.h += 1;
+			} else {
+				this.rect.y += 1;
+			}
+			dirty = true;
+		} else if (dir === Utils.KeyCodes.LEFT) {
+			if (shiftDown) {
+				this.rect.w -= 1;
+			} else {
+				this.rect.x -= 1;
+			}
+			dirty = true;
+		} else if (dir === Utils.KeyCodes.RIGHT) {
+			if (shiftDown) {
+				this.rect.w += 1;
+			} else {
+				this.rect.x += 1;
+			}
+			dirty = true;
+		}
+
+		return dirty;
+	}
+
+	inBounds(x, y) {
+		var pointRect = new Utils.Rect(x, y, 1, 1);
+		return pointRect.hasIntersect(this.rect);
+	}
+
+	renderOptions() {
+		return Selection.getOptionsElement();
+	}
+
+	keyUpEvent(e) {
+		var _call = Selection.ModesKeyUp[this.selectionMode].bind(this);
+
+		var dirty = _call(e.which, e.shiftKey);
+
+		if (dirty) {
+			this.reposition();
+		}
+
+		return dirty;
+	}
+
 	keyDownEvent() {}
 	mouseMoveEvent() {}
 
@@ -126,9 +201,63 @@ class Selection extends Focusable {
 		this.pos = null;
 	}
 }
+Selection.Modes = {
+	None: 0,
+	Grid: 1,
+	Auto: 2,
+	Side: 3
+};
+
+Selection.ModesKeyUp = {};
+Selection.ModesKeyUp[Selection.Modes.None] = Selection.prototype.keyUpEventNone;
+Selection.ModesKeyUp[Selection.Modes.Grid] = Selection.prototype.keyUpEventGrid;
+Selection.ModesKeyUp[Selection.Modes.Auto] = Selection.prototype.keyUpEventAuto;
+Selection.ModesKeyUp[Selection.Modes.Side] = Selection.prototype.keyUpEventSide;
+
+
 Selection.template = `
 <div class="selection"></div>
 `;
+
+Selection.optionsHtml = `
+	<table>
+		<tr>
+			<td><a href="#" class="button light"><i class="icon-th"></i>&nbsp;Grid Mode</a></td>
+			<td><a href="#" class="button light"><i class="icon-reorder"></i>&nbsp;Auto Mode</a></td>
+		</tr>
+		<tr>
+			<td><a href="#" class="button light"><i class="icon-th-list"></i>&nbsp;Side Mode</a></td>
+			<td></td>
+		</tr>
+	</table>
+`;
+Selection.optionsElement = null;
+Selection.boundSelection = null;
+
+Selection.getOptionsElement = function() {
+	if (Selection.optionsElement === null) {
+		Selection.optionsElement = $(Selection.optionsHtml);
+		Selection.delegate();
+	}
+
+	return Selection.optionsElement;
+};
+
+Selection.bindTo = function(selection) {
+	Selection.boundSelection = selection;
+};
+
+Selection.delegate = function() {
+	var container = Selection.optionsElement;
+};
+
+Selection.updateOptions = function(selection) {
+	if (Selection.optionsElement === null) {
+		Selection.getOptionsElement();
+	}
+
+	Selection.bindTo(selection);
+};
 
 class Element {
 	reposition() {}
@@ -172,7 +301,46 @@ class Sprite extends (Element, Focusable) {
 
 	renderOptions() {}
 
-	keyUpEvent() {}
+	keyUpEvent(e) {
+		var dirty = false;
+
+		if (e.which === Utils.KeyCodes.UP) {
+			if (e.shiftKey) {
+				this.rect.h -= 1;
+			} else {
+				this.rect.y -= 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.DOWN) {
+			if (e.shiftKey) {
+				this.rect.h += 1;
+			} else {
+				this.rect.y += 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.LEFT) {
+			if (e.shiftKey) {
+				this.rect.w -= 1;
+			} else {
+				this.rect.x -= 1;
+			}
+			dirty = true;
+		} else if (e.which === Utils.KeyCodes.RIGHT) {
+			if (e.shiftKey) {
+				this.rect.w += 1;
+			} else {
+				this.rect.x += 1;
+			}
+			dirty = true;
+		}
+
+		if (dirty) {
+			this.reposition();
+		}
+
+		return dirty;
+	}
+
 	keyDownEvent() {}
 	mouseMoveEvent() {}
 }
@@ -213,12 +381,6 @@ class Group extends (Element, Focusable) {
 
 		this.element = $(Mustache.to_html(Group.boxTemplate, {}));
 
-		/*var screen_pos = this.editor.active_project.imagePosToRelativePos(this.rect.x, this.rect.y);
-		screen_pos.w = this.rect.w;
-		screen_pos.h = this.rect.h;
-
-
-		this.element.css(screen_pos.toCss());*/
 		this.reposition();
 
 		container.append(this.element);
@@ -308,7 +470,12 @@ Group.boxTemplate = `
 Group.optionsHtml = `
 	<table>
 		<tr>
-			<td><input type="text" name="group-name" placeholder="Group Name" /></td>
+			<td colspan="3"><input type="text" name="group-name" placeholder="Group Name" /></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
 		</tr>
 	</table>
 `;

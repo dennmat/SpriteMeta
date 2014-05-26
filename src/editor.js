@@ -167,9 +167,12 @@ class Editor {
 			
 			if (this.focusedElement.keyUpEvent(e)) {
 				e.preventDefault();
+				e.stopPropagation();
 				return false;
 			}
 		});
+
+		$(window).keydown(e => { e.preventDefault(); });
 
 		this.element.on('click', '.tools-container a', e => {
 			e.preventDefault();
@@ -238,6 +241,7 @@ class Editor {
 						this.selectionRegion = adjustedPos;
 						
 						this.selection = new Elements.Selection(this, this.selectionRegion);
+						this.focus(this.selection);
 					}
 				});
 
