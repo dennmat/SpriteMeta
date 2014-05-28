@@ -70,6 +70,8 @@ class Selection extends Focusable {
 
 		this.selectionMode = Selection.Modes.None;
 
+		this.subSelects = [];
+
 		this.build();
 	}
 
@@ -79,6 +81,31 @@ class Selection extends Focusable {
 		this.reposition();
 
 		this.editor.getEditorContainer().append(this.element);
+	}
+
+	setMode(newMode) {
+		this.selectionMode = newMode;
+
+		var optionsElement = Selection.getOptionsElement();
+
+		optionsElement.find('.selection-modes').hide();
+
+		switch(newMode) {
+			case Selection.Modes.Grid: 
+				this.initGridMode();
+				optionsElement.find('.selection-grid-options').show();
+			break;
+			case Selection.Modes.Auto:
+				this.initAutoMode();
+				optionsElement.find('.selection-auto-options').show();
+			break;
+			case Selection.Modes.Side:
+				this.initSideMode();
+				optionsElement.find('.selection-side-options').show();
+			break;
+		}
+
+		this.reposition();
 	}
 
 	/*move(deltaX, deltaY) {
@@ -99,6 +126,8 @@ class Selection extends Focusable {
 		var imagePosition = this.editor.active_project.getImagePosition();
 
 		this.element.css(adjustedPos.toCss());
+		
+		this.repositionSubSelects();
 	}
 
 	setDimensions(w, h) {
@@ -112,8 +141,87 @@ class Selection extends Focusable {
 		this.reposition();
 	}
 
-	initGridMode() {
+	repositionSubSelects() {
+		for (var sub of this.subSelects) {
+			var zoomAdjust = sub.rect.copy();
+			zoomAdjust.adjustToZoom(this.editor.zoom);
 
+			sub.element.css(zoomAdjust.toCss());
+		}
+	}
+
+	addSubSelect(subRect) {
+		var ele = $(Mustache.to_html(Selection.subSelectTemplate));
+		this.subSelects.push({
+			rect: subRect,
+			element: ele
+		});
+
+		ele.css(subRect.toCss());
+
+		this.element.append(ele);
+	}
+
+	initGridMode() {
+		/*
+			Currently this function makes some assumptions:
+				h <= 50: Single Row, cells are w/5 wide
+				w <= 50: Single Column, cells are h/5 tall
+				Or h <= 50 && w <= 50, single cell
+			Hopefully I can find a better way to init this.
+			Grid mode may also resize selection rect to fit perfect.
+		*/
+
+		var numCols = 1,
+			cellWidth = 0,
+			numRows = 1,
+			cellHeight = 0;
+
+		if (this.rect.h <= 50 && this.rect.w <= 50) {
+			numCols = 1;
+			numRows = 1;
+			cellHeight = 50;
+			cellWidth = 50;
+		} else if (this.rect.h <= 50) {
+			numRows = 1;
+			cellHeight = 50;
+			cellWidth = Math.floor(this.rect.w/5);
+			numCols = Math.floor(this.rect.w/cellWidth);
+		} else if (this.rect.w <= 50) {
+			numCols = 1;
+			cellWidth = 50;
+			cellHeight = Math.floor(this.rect.h/5);
+			numRows = Math.floor(this.rect.h/cellHeight);
+		} else {
+			cellWidth = Math.floor(this.rect.w/5);
+			cellHeight = Math.floor(this.rect.h/5);
+			numCols = Math.floor(this.rect.w/cellWidth);
+			numRows = Math.floor(this.rect.h/cellHeight);
+		}
+
+		this.rect.w = cellWidth * numCols;
+		this.rect.h = cellHeight * numRows;
+
+		var cell_count = numCols * numRows;
+		var on_row = 0,
+			on_col = 0;
+
+		if (cell_count > 1) {
+			for (var i = 0; i < cell_count; i++) {
+				//Add Subselects
+				var x = on_col * cellWidth;
+
+				if (x + cellWidth > this.rect.w) {
+					on_row++;
+					on_col = 0;
+					x = 0;
+				}
+
+				var y = on_row * cellHeight;
+				this.addSubSelect(new Utils.Rect(x, y, cellWidth, cellHeight));
+				on_col++;
+			}
+		}
 	}
 
 	initAutoMode() {
@@ -125,7 +233,24 @@ class Selection extends Focusable {
 	}
 
 	keyUpEventGrid(dir, shiftDown) {
+		var dirty = false;
 
+		switch(dir) {
+			case Utils.KeyCodes.UP:
+				dirty = true;
+			break;
+			case Utils.KeyCodes.DOWN:
+				dirty = true;
+			break;
+			case Utils.KeyCodes.LEFT:
+				dirty = true;
+			break;
+			case Utils.KeyCodes.RIGHT:
+				dirty = true;
+			break;
+		}
+
+		return dirty;
 	}
 
 	keyUpEventAuto(dir, shiftDown) {
@@ -201,6 +326,7 @@ class Selection extends Focusable {
 		this.pos = null;
 	}
 }
+
 Selection.Modes = {
 	None: 0,
 	Grid: 1,
@@ -214,29 +340,47 @@ Selection.ModesKeyUp[Selection.Modes.Grid] = Selection.prototype.keyUpEventGrid;
 Selection.ModesKeyUp[Selection.Modes.Auto] = Selection.prototype.keyUpEventAuto;
 Selection.ModesKeyUp[Selection.Modes.Side] = Selection.prototype.keyUpEventSide;
 
-
 Selection.template = `
 <div class="selection"></div>
 `;
 
 Selection.optionsHtml = `
 	<table>
-		<tr>
-			<td><a href="#" class="button light"><i class="icon-th"></i>&nbsp;Grid Mode</a></td>
-			<td><a href="#" class="button light"><i class="icon-reorder"></i>&nbsp;Auto Mode</a></td>
+		<tr class="selection-modes">
+			<td><a href="#" class="button light selection-grid-mode"><i class="icon-th"></i>&nbsp;Grid Mode</a></td>
+			<td><a href="#" class="button light selection-auto-mode"><i class="icon-reorder"></i>&nbsp;Auto Mode</a></td>
 		</tr>
-		<tr>
-			<td><a href="#" class="button light"><i class="icon-th-list"></i>&nbsp;Side Mode</a></td>
+		<tr class="selection-modes">
+			<td><a href="#" class="button light selection-side-mode"><i class="icon-th-list"></i>&nbsp;Side Mode</a></td>
 			<td></td>
+		</tr>
+		<tr class="selection-grid-options">
+			<td colspan="2">Selection - Grid Mode</td>
+		</tr>
+		<tr class="selection-grid-options">
+			<td colspan="2"><input name="selection-grid-width" placeholder="Cell Width" type="text" /></td>
+		</tr>
+		<tr class="selection-grid-options">
+			<td colspan="2"><input name="selection-grid-height" placeholder="Cell Height" type="text" /></td>
 		</tr>
 	</table>
 `;
 Selection.optionsElement = null;
 Selection.boundSelection = null;
 
+Selection.subSelectTemplate = `
+	<div class="selection-sub-select">
+	</div>
+`;
+
 Selection.getOptionsElement = function() {
 	if (Selection.optionsElement === null) {
 		Selection.optionsElement = $(Selection.optionsHtml);
+
+		['grid', 'auto', 'side'].forEach(item => {
+			Selection.optionsElement.find('.selection-' + item + '-options').hide();
+		});
+
 		Selection.delegate();
 	}
 
@@ -249,14 +393,29 @@ Selection.bindTo = function(selection) {
 
 Selection.delegate = function() {
 	var container = Selection.optionsElement;
+
+	container.on('click', '.selection-grid-mode', e => {
+		Selection.boundSelection.setMode(Selection.Modes.Grid);
+	});
+	container.on('click', '.selection-auto-mode', e => {
+		Selection.boundSelection.setMode(Selection.Modes.Auto);
+	});
+	container.on('click', '.selection-side-mode', e => {
+		Selection.boundSelection.setMode(Selection.Modes.Side);
+	});
 };
 
 Selection.updateOptions = function(selection) {
+	Selection.bindTo(selection);
+
 	if (Selection.optionsElement === null) {
 		Selection.getOptionsElement();
 	}
 
-	Selection.bindTo(selection);
+	Selection.optionsElement.find('.selection-modes').show();
+	['grid', 'auto', 'side'].forEach(item => {
+		Selection.optionsElement.find('.selection-' + item + '-options').hide();
+	});
 };
 
 class Element {

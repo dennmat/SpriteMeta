@@ -133,6 +133,7 @@ class Editor {
 	}
 
 	selectionMade() {
+		Elements.Selection.updateOptions(this.selection);
 		this.tools.enableSelectionTools();
 	}
 
@@ -213,6 +214,10 @@ class Editor {
 
 				$(window).mousemove(we => {
 					we.preventDefault();
+
+					if (this.selection !== null) {
+						return;
+					}
 
 					var relative = this.getEditorContainer().offset();
 					

@@ -47,7 +47,7 @@ class Project {
 	}
 
 	imagePosToRelativePos(x, y) {
-		var relative = this.getImagePosition();//this.editor.image_element.position();
+		var relative = this.getImagePosition();
 
 		return new Utils.Rect(x + relative.x, y + relative.y);
 	}
@@ -68,16 +68,6 @@ class Project {
 	}
 
 	addGroup(group) {
-		//Determine spriteset.
-		/*var sprites = [];
-		var i = 0;
-		for (var sprite of this.sprites) {
-			if (sprite.rect.hasIntersect(rect)) {
-				sprites.push(i);
-			}
-			i++;
-		}*/
-
 		var id = 'group-' + (++Project._group_count).toString();
 		group.setId(id);
 

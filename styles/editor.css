@@ -17,6 +17,15 @@
 	border: 1px solid rgba(150, 150, 255, 1);
 }
 
+#editor .selection .selection-sub-select {
+	z-index: 101;
+	border: 1px solid #000;
+	
+	top: 0;
+	left: 0;
+	position: absolute;
+}
+
 #editor .group-box {
 	border-color: rgba(150, 255, 150, 1);
 	background: rgba(150, 255, 150, .3);
