@@ -1,5 +1,7 @@
-spritzup
+spritzup (Probably not the final name)
 ========
+
+*v0.0a Not very useful right now. 0.1a will have basic functionality.*
 
 A tool mainly for sectioning regions of a spritesheet into groups and individual sprites and exporting to a useable format.
 
