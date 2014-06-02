@@ -3,6 +3,7 @@
 }
 
 #editor .group-box,
+#editor .sprite-box,
 #editor .selection {
 	background: rgba(150, 150, 255, .4);
 	min-width: 1px;
@@ -19,7 +20,7 @@
 
 #editor .selection .selection-sub-select {
 	z-index: 101;
-	border: 1px solid #000;
+	border: 1px dashed rgba(150, 150, 255, .8);
 	
 	top: 0;
 	left: 0;
@@ -31,6 +32,10 @@
 	background: rgba(150, 255, 150, .3);
 }
 
+#editor .sprite-box {
+	border-color: rgba(255, 200, 200, .7);
+	background: rgba(255, 200, 200, .4);
+}
 
 #editor .left-pane {
 	box-sizing: border-box;

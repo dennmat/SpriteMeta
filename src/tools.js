@@ -76,7 +76,25 @@ class SpriteTool extends Tool {
 
 	handle(editor) {
 		var selection = editor.selection;
+		var project = editor.active_project;
+
+		var sprites = selection.getSelections();
 		
+		var spriteObj = null;
+		for (var sprite of sprites) {
+			spriteObj = new Elements.Sprite(editor, {
+				rect: sprite.rect
+			});
+			project.addSprite(spriteObj);
+		}
+
+		if (sprites.length > 1) {
+			editor.clearFocus();
+		} else if (spriteObj !== null) {
+			editor.focus(spriteObj);
+		}
+
+		editor.removeSelection();
 	}
 
 	requiresSelection() { return true; }

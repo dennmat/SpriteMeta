@@ -53,6 +53,8 @@ class Rect {
 		this.y += otherRect.y;
 		this.w += otherRect.w;
 		this.h += otherRect.h;
+
+		return this;
 	}
 
 	substract(otherRect) {
@@ -60,6 +62,8 @@ class Rect {
 		this.y -= otherRect.y;
 		this.w -= otherRect.w;
 		this.h -= otherRect.h;
+
+		return this;
 	}
 
 	toCss() {

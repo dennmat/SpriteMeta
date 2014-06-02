@@ -126,7 +126,7 @@ class Selection extends Focusable {
 		var imagePosition = this.editor.active_project.getImagePosition();
 
 		this.element.css(adjustedPos.toCss());
-		
+
 		this.repositionSubSelects();
 	}
 
@@ -160,6 +160,24 @@ class Selection extends Focusable {
 		ele.css(subRect.toCss());
 
 		this.element.append(ele);
+	}
+
+	getSelections() {
+		if (this.subSelects.length == 0) {
+			return [{rect: this.rect}];
+		} else {
+			var selections = [];
+			var posRect = this.rect.copy();
+			posRect.w = 0;
+			posRect.h = 0;
+			for (var sub of this.subSelects) {
+				selections.push({
+					rect: sub.rect.copy().add(posRect)
+				});
+			}
+
+			return selections;
+		}
 	}
 
 	initGridMode() {
@@ -427,11 +445,13 @@ class Element {
 class Sprite extends (Element, Focusable) {
 	constructor(editor, info) {
 		this.editor = editor;
-		this.rect = new Utils.Rect();
+		this.rect = null;
 
-		if (info) {
+		if (info !== undefined) {
 			this.load(info);
 		}
+
+		this.build();
 	}
 
 	reposition() {
@@ -446,7 +466,21 @@ class Sprite extends (Element, Focusable) {
 	}
 
 	load(info) {
+		if (info.rect !== undefined) {
+			this.rect = info.rect;
+		} else {
+			this.rect = new Utils.Rect();
+		}
+	}
 
+	build() {
+		var container = this.editor.getEditorContainer();
+
+		this.element = $(Mustache.to_html(Sprite.boxTemplate, {}));
+
+		this.reposition();
+
+		container.append(this.element);
 	}
 
 	serialize() {
@@ -508,12 +542,54 @@ Sprite.boxTemplate = `
 	<div class="sprite-box"></div>
 `;
 
+Sprite.optionsHtml = `
+	<table>
+		<tr>
+			<td colspan="3">Sprite Test</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+`;
+Sprite.optionsElement = null;
+Sprite.boundSprite = null;
+
+Sprite.getOptionsElement = function() {
+	if (Sprite.optionsElement === null) {
+		Sprite.optionsElement = $(Sprite.optionsHtml);
+		Sprite.delegate();
+	}
+
+	return Sprite.optionsElement;
+};
+
+Sprite.bindTo = function(sprite) {
+	Sprite.boundSprite = sprite;
+};
+
+Sprite.delegate = function() {
+	var container = Sprite.optionsElement;
+};
+
+Sprite.updateOptions = function(sprite) {
+	if (Sprite.optionsElement === null) {
+		Sprite.getOptionsElement();
+	}
+
+	Sprite.bindTo(sprite);
+};
+
 class Group extends (Element, Focusable) {
 	constructor(editor, info) {
 		this.editor = editor;
 
 		this.rect = null;
 		this.sprites = [];
+
+		this.element = null;
 
 		this.name = '';
 		this.id = null;

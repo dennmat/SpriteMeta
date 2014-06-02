@@ -43,7 +43,12 @@ class Project {
 	relativePosToImagePos(x, y) {
 		var relative = this.getImagePosition();
 		
-		return new Utils.Rect(x - relative.x, y - relative.y);
+		var rect = new Utils.Rect(x - relative.x, y - relative.y);
+
+		if (rect.x < 0) { rect.x = 0; }
+		if (rect.y < 0) { rect.y = 0; }
+
+		return rect;
 	}
 
 	imagePosToRelativePos(x, y) {
@@ -65,6 +70,10 @@ class Project {
 		for (var groupKey in this.groups) {
 			this.groups[groupKey].reposition();
 		}
+
+		for (var sprite of this.sprites) {
+			sprite.reposition();
+		}
 	}
 
 	addGroup(group) {
@@ -76,17 +85,14 @@ class Project {
 		this.markDirty(true);
 	}
 
-	addSprite(rect) {
+	addSprite(sprite) {
 		//Check for collisions
-		for (var sprite of this.sprites) {
-			if (sprite.rect.hasIntersect(rect)) {
-				return false;
-			}
-		}
-
-		this.sprites.push({
-			region: rect
-		});
+		//for (var sprite of this.sprites) {
+		//	if (sprite.rect.hasIntersect(rect)) {
+		//		return false;
+		//	}
+		//}
+		this.sprites.push(sprite);
 
 		this.markDirty(true);
 	}

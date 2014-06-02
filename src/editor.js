@@ -113,7 +113,8 @@ class Editor {
 			return;
 		}
 
-		var relative = this.getEditorContainer().offset();
+		var container = this.getEditorContainer();
+		var relative = container.offset();
 
 		var adjustedRegion = this.selectionRegion.copy();
 		adjustedRegion.adjustToZoom(this.zoom);
@@ -122,9 +123,8 @@ class Editor {
 		adjustedPos.w = adjustedRegion.w;
 		adjustedPos.h = adjustedRegion.h;
 
-
 		var w = (e.pageX - relative.left) - adjustedPos.x;
-		var h = (e.pageY - relative.top) - adjustedPos.y;
+		var h = ((e.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
 
 		this.selection.setDimensions(w, h);
 
@@ -148,12 +148,24 @@ class Editor {
 		this.setOptions();
 	}
 
+	clearFocus() {
+		if (this.focusedElement === null) {
+			return;
+		}
+
+		this.focusedElement.blur();
+		this.focusedElement = null;
+
+		this.setOptions();
+	}
+
 	clearOptions() {
 		this.element.find('.tool-options').empty();
 	}
 
 	setOptions() {
 		if (this.focusedElement === null) {
+			this.element.find('.tool-options').empty();
 			return;
 		}
 
@@ -215,11 +227,12 @@ class Editor {
 				$(window).mousemove(we => {
 					we.preventDefault();
 
-					if (this.selection !== null) {
+					if (this.selection !== null && !this.selecting) {
 						return;
 					}
 
-					var relative = this.getEditorContainer().offset();
+					var container = this.getEditorContainer();
+					var relative = container.offset();
 					
 					if (this.selecting) {
 						var adjustedRegion = this.selectionRegion.copy();
@@ -230,12 +243,20 @@ class Editor {
 						adjustedPos.h = adjustedRegion.h;
 
 						var w = (we.pageX - relative.left) - adjustedPos.x;
-						var h = (we.pageY - relative.top) - adjustedPos.y;
+						var h = ((we.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
+
+						if (w > this.active_project.baseDimensions.w) {
+							w = this.active_project.baseDimensions.w;
+						}
+						if (h > this.active_project.baseDimensions.h) {
+							h = this.active_project.baseDimensions.h;
+						}
 
 						this.selection.setDimensions(w, h);
 					} else {
 						this.selecting = true;
-						var region = new Utils.Rect(e.pageX - relative.left, e.pageY - relative.top);
+						
+						var region = new Utils.Rect(e.pageX - relative.left, (e.pageY - relative.top) + container.get(0).scrollTop);
 
 						var adjustedPos = this.active_project.relativePosToImagePos(region.x, region.y);
 						adjustedPos.w = region.w;

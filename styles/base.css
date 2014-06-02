@@ -21,3 +21,8 @@
     font-style: normal;
 }
 
+* {
+   user-select: none;
+   -webkit-user-select: none;
+}
+
