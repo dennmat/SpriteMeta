@@ -36,13 +36,13 @@ How To Build
 
 Make sure nodewebkit is on your path
 
-Get the dependencies then just run `build.bat`.
+Get the dependencies.
 
-#### Linux
+Then from the root dir where build.py is run:
+```bash
+python build.py
+```
 
-No build script yet, however shouldn't be hard to make can reuse node script for compiling traceur.
-
->*Note:* traceur builds into a directory 'c/' in the root of the project. Use these in requires. 
 
 Current Status
 --------------
