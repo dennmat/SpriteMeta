@@ -32,7 +32,7 @@ npm install traceur
 
 How To Build
 ------------
-#### Windows
+#### Windows/Linux (OSX Probably can as well, but ask yourself why am I deving games on a mac?)
 
 Make sure nodewebkit is on your path
 
