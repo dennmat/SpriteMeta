@@ -1,9 +1,9 @@
 var fs = require('fs');
 
-var Utils = require('../c/utils.js');
-var Project = require('../c/project.js');
-var Elements = require('../c/elements.js');
-var Tools = require('../c/tools.js');
+var Utils = require('./utils.js');
+var Project = require('./project.js');
+var Elements = require('./elements');
+var Tools = require('./tools.js');
 
 class Editor {
 	constructor(container, tab_manager) {
@@ -173,8 +173,20 @@ class Editor {
 	}
 
 	delegate() {
-		$(window).on('keyup', e => {
+		/*$(window).on('keyup', e => {
 			if (this.focusedElement === null) {
+				return true;
+			}
+
+			var cnt = false;
+			for (var kc in Utils.KeyCodes) {
+				if (Utils.KeyCodes[kc] === e.keycode) {
+					cnt = true;
+					break;
+				}
+			}
+
+			if (!cnt) {
 				return true;
 			}
 			
@@ -183,9 +195,9 @@ class Editor {
 				e.stopPropagation();
 				return false;
 			}
-		});
+		});*/
 
-		$(window).keydown(e => { e.preventDefault(); });
+		/*$(window).keydown(e => { e.preventDefault(); });*/
 
 		this.element.on('click', '.tools-container a', e => {
 			e.preventDefault();
@@ -257,16 +269,16 @@ class Editor {
 						this.selecting = true;
 						
 						var region = new Utils.Rect(e.pageX - relative.left, (e.pageY - relative.top) + container.get(0).scrollTop);
-
 						var adjustedPos = this.active_project.relativePosToImagePos(region.x, region.y);
+						
 						adjustedPos.w = region.w;
 						adjustedPos.h = region.h;
 
 						adjustedPos.removeZoom(this.zoom);
 
 						this.selectionRegion = adjustedPos;
-						
 						this.selection = new Elements.Selection(this, this.selectionRegion);
+						console.log(this.selection);
 						this.focus(this.selection);
 					}
 				});

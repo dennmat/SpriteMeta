@@ -1,6 +1,6 @@
 var Mustache = require('mustache');
 
-var Elements = require('../c/elements.js');
+var Elements = require('./elements');
 
 class Tool {
 	constructor() {

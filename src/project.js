@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var Utils = require('../c/utils.js');
+var Utils = require('./utils.js');
 
 class Project {
 	constructor(info, editor, spriter_path=null) {

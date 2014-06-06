@@ -1,58 +1,8 @@
-var Utils = require('../c/utils.js');
+var Focusable = require('./base.js').Focusable;
+
+var Utils = require('../utils.js');
 
 var Mustache = require('mustache');
-
-/******
-Interfaces don't work as expected in traceur yet
-so I'm defining one a class here:
-
-a Class that implements these member(s):
--hasFocus
-and these method(s):
--receiveFocus
--blur
--acceptEvent(type, event)
--inBounds(x, y)
-
-Will be focusable from the editor and can receive
-certain events
-******/
-
-class Focusable {
-	constructor() {
-		this.hasFocus = false;
-	}
-
-	receiveFocus() {
-		this.hasFocus = true;
-	}
-
-	blur() {
-		this.hasFocus = false;
-	}
-
-	inBounds(x, y) {} //Determine if a mouse click lands within the element and should receive focus
-
-	renderOptions() {}
-
-	acceptEvent(type, event) {
-		switch(type) {
-			case Focusable.KeyDownEvent:
-				this.keyDownEvent(event);
-				break;
-			case Focusable.KeyUpEvent:
-				this.keyUpEvent(event);
-				break;
-			case Focusable.MouseMoveEvent:
-				this.mouseMoveEvent(event);
-				break;
-		}
-	}
-}
-Focusable.KeyDownEvent = 0;
-Focusable.KeyUpEvent = 1;
-Focusable.MouseMoveEvent = 2;
-
 
 //This is what's created before we know what it will be
 class Selection extends Focusable {
@@ -71,6 +21,9 @@ class Selection extends Focusable {
 		this.selectionMode = Selection.Modes.None;
 
 		this.subSelects = [];
+
+		//Selection Type Data
+		this.gridSize = new Utils.Rect();
 
 		this.build();
 	}
@@ -132,11 +85,16 @@ class Selection extends Focusable {
 
 	setDimensions(w, h) {
 		var tempRect = new Utils.Rect(this.rect.x, this.rect.y, w, h);
+		
+		//Gotta preserve x,y in this case. because it's essentially treated as a new position that isn't shifting an existing value
+		var oldx = tempRect.x;
+		var oldy = tempRect.y;
 		tempRect.removeZoom(this.editor.zoom);
+		tempRect.x = oldx;
+		tempRect.y = oldy;
+
 
 		this.rect = tempRect;
-
-		//console.log("SETTING DIMENSIONS", w, h, this.rect);
 
 		this.reposition();
 	}
@@ -160,6 +118,16 @@ class Selection extends Focusable {
 		ele.css(subRect.toCss());
 
 		this.element.append(ele);
+	}
+
+	clearSubSelects() {
+		for (var s of this.subSelects) {
+			s.element.remove();
+			s.element = null;
+			s.rect = null;
+		}
+
+		this.subSelects.length = 0;
 	}
 
 	getSelections() {
@@ -240,6 +208,28 @@ class Selection extends Focusable {
 				on_col++;
 			}
 		}
+		this.gridSize.w = cellWidth;
+		this.gridSize.h = cellHeight;
+	}
+
+	resizeGrid(cw, ch) {
+		this.gridSize.w = cw;
+		this.gridSize.h = ch;
+
+		var numCols = Math.floor(this.rect.w/cw);
+		var numRows = Math.floor(this.rect.h/ch);
+
+		this.clearSubSelects();
+
+		for (var r = 0; r < numRows; r++) {
+			var y = r * ch;
+			for (var c = 0; c < numCols; c++) {
+				var x = c * cw;
+				this.addSubSelect(new Utils.Rect(x, y, cw, ch));
+			}
+		}
+
+		this.reposition();
 	}
 
 	initAutoMode() {
@@ -376,10 +366,10 @@ Selection.optionsHtml = `
 			<td colspan="2">Selection - Grid Mode</td>
 		</tr>
 		<tr class="selection-grid-options">
-			<td colspan="2"><input name="selection-grid-width" placeholder="Cell Width" type="text" /></td>
+			<td>Width: </td><td><input name="selection-grid-width" placeholder="Cell Width" type="text" /></td>
 		</tr>
 		<tr class="selection-grid-options">
-			<td colspan="2"><input name="selection-grid-height" placeholder="Cell Height" type="text" /></td>
+			<td>Height: </td><td><input name="selection-grid-height" placeholder="Cell Height" type="text" /></td>
 		</tr>
 	</table>
 `;
@@ -409,6 +399,66 @@ Selection.bindTo = function(selection) {
 	Selection.boundSelection = selection;
 };
 
+Selection.keyCoolDown = null;
+Selection.keyUpCallBack = null;
+
+//Grid Mode Functions
+Selection.GridWidthKeyUp = function(e) {
+	var container = Selection.optionsElement;
+	var nw = parseInt(container.find('input[name="selection-grid-width"]').val());
+	var nh = Selection.boundSelection.gridSize.h;
+
+	if (e.keyCode === Utils.KeyCodes.UP) {
+		nw += 1;
+		container.find('input[name="selection-grid-width"]').val(nw);
+	} else if (e.keyCode === Utils.KeyCodes.DOWN) {
+		nw -= 1;
+		container.find('input[name="selection-grid-width"]').val(nw);
+	}
+
+	if (!isNaN(nw)) {
+		Selection.boundSelection.resizeGrid(nw, nh);
+	}
+};
+
+Selection.GridHeightKeyUp = function(e) {
+	var container = Selection.optionsElement;
+	var nh = parseInt(container.find('input[name="selection-grid-height"]').val());
+	var nw = Selection.boundSelection.gridSize.w;
+
+	if (e.keyCode === Utils.KeyCodes.UP) {
+		nh += 1;
+		container.find('input[name="selection-grid-height"]').val(nh);
+	} else if (e.keyCode === Utils.KeyCodes.DOWN) {
+		nh -= 1;
+		container.find('input[name="selection-grid-height"]').val(nh);
+	}
+	
+	if (!isNaN(nh)) {
+		Selection.boundSelection.resizeGrid(nw, nh);
+	}
+};
+
+//Would love to eventually rework all this
+//Makes it so theres a timeout before attempting to render, make sure the user is done typing
+//Might change to enter key validation
+Selection.setUpKeyUpEvent = function(callback) {
+	return (function() {
+		return e => {
+			if (Selection.keyCoolDown !== null) {
+				clearTimeout(Selection.keyCoolDown);
+			}
+			
+			Selection.keyCoolDown = setTimeout(function() { 
+				callback(e);
+				Selection.keyCoolDown = null;
+				Selection.callback = null;
+			}, 100);
+		}
+	})();
+}
+
+
 Selection.delegate = function() {
 	var container = Selection.optionsElement;
 
@@ -421,6 +471,10 @@ Selection.delegate = function() {
 	container.on('click', '.selection-side-mode', e => {
 		Selection.boundSelection.setMode(Selection.Modes.Side);
 	});
+
+	//Grid Mode
+	container.on('keyup', 'input[name="selection-grid-width"]', Selection.setUpKeyUpEvent(Selection.GridWidthKeyUp));
+	container.on('keyup', 'input[name="selection-grid-height"]', Selection.setUpKeyUpEvent(Selection.GridHeightKeyUp));
 };
 
 Selection.updateOptions = function(selection) {
@@ -436,327 +490,6 @@ Selection.updateOptions = function(selection) {
 	});
 };
 
-class Element {
-	reposition() {}
-	load(info) {}
-	serialize() {}
-}
-
-class Sprite extends (Element, Focusable) {
-	constructor(editor, info) {
-		this.editor = editor;
-		this.rect = null;
-
-		if (info !== undefined) {
-			this.load(info);
-		}
-
-		this.build();
-	}
-
-	reposition() {
-		var screen_pos = this.rect.copy();
-		screen_pos.adjustToZoom(this.editor.zoom);
-
-		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
-		adjusted_pos.w = screen_pos.w;
-		adjusted_pos.h = screen_pos.h;
-
-		this.element.css(adjusted_pos.toCss());
-	}
-
-	load(info) {
-		if (info.rect !== undefined) {
-			this.rect = info.rect;
-		} else {
-			this.rect = new Utils.Rect();
-		}
-	}
-
-	build() {
-		var container = this.editor.getEditorContainer();
-
-		this.element = $(Mustache.to_html(Sprite.boxTemplate, {}));
-
-		this.reposition();
-
-		container.append(this.element);
-	}
-
-	serialize() {
-
-	}
-
-	inBounds(x, y) {
-		var pointRect = new Utils.Rect(x, y, 1, 1);
-		return pointRect.hasIntersect(this.rect);
-	}
-
-	renderOptions() {}
-
-	keyUpEvent(e) {
-		var dirty = false;
-
-		if (e.which === Utils.KeyCodes.UP) {
-			if (e.shiftKey) {
-				this.rect.h -= 1;
-			} else {
-				this.rect.y -= 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.DOWN) {
-			if (e.shiftKey) {
-				this.rect.h += 1;
-			} else {
-				this.rect.y += 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.LEFT) {
-			if (e.shiftKey) {
-				this.rect.w -= 1;
-			} else {
-				this.rect.x -= 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.RIGHT) {
-			if (e.shiftKey) {
-				this.rect.w += 1;
-			} else {
-				this.rect.x += 1;
-			}
-			dirty = true;
-		}
-
-		if (dirty) {
-			this.reposition();
-		}
-
-		return dirty;
-	}
-
-	keyDownEvent() {}
-	mouseMoveEvent() {}
-}
-
-Sprite.boxTemplate = `
-	<div class="sprite-box"></div>
-`;
-
-Sprite.optionsHtml = `
-	<table>
-		<tr>
-			<td colspan="3">Sprite Test</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-	</table>
-`;
-Sprite.optionsElement = null;
-Sprite.boundSprite = null;
-
-Sprite.getOptionsElement = function() {
-	if (Sprite.optionsElement === null) {
-		Sprite.optionsElement = $(Sprite.optionsHtml);
-		Sprite.delegate();
-	}
-
-	return Sprite.optionsElement;
-};
-
-Sprite.bindTo = function(sprite) {
-	Sprite.boundSprite = sprite;
-};
-
-Sprite.delegate = function() {
-	var container = Sprite.optionsElement;
-};
-
-Sprite.updateOptions = function(sprite) {
-	if (Sprite.optionsElement === null) {
-		Sprite.getOptionsElement();
-	}
-
-	Sprite.bindTo(sprite);
-};
-
-class Group extends (Element, Focusable) {
-	constructor(editor, info) {
-		this.editor = editor;
-
-		this.rect = null;
-		this.sprites = [];
-
-		this.element = null;
-
-		this.name = '';
-		this.id = null;
-
-		if (info !== undefined) {
-			this.load(info);
-		}
-
-		this.build();
-	}
-
-	setId(id) {
-		this.id = id;
-
-		if (this.name.length === 0) {
-			this.name = "Untitled Group " + id;
-		}
-
-		this.element.data('group-id', id);
-	}
-
-	build() {
-		var container = this.editor.getEditorContainer();
-
-		this.element = $(Mustache.to_html(Group.boxTemplate, {}));
-
-		this.reposition();
-
-		container.append(this.element);
-	}
-
-	reposition() {
-		var screen_pos = this.rect.copy();
-		screen_pos.adjustToZoom(this.editor.zoom);
-
-		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
-		adjusted_pos.w = screen_pos.w;
-		adjusted_pos.h = screen_pos.h;
-
-		this.element.css(adjusted_pos.toCss());		
-	}
-
-	load(info) {
-		this.rect = (info !== undefined && info.rect !== undefined)? info.rect : new Utils.Rect();
-	}
-
-	serialize() {
-		return {
-			name: this.name,
-			rect: this.rect.toDict(),
-			sprites: this.sprites
-		}
-	}
-
-	inBounds(x, y) {
-		var pointRect = new Utils.Rect(x, y, 1, 1);
-		return pointRect.hasIntersect(this.rect);
-	}
-
-	renderOptions() {
-		Group.updateOptions(this);
-		return Group.getOptionsElement();
-	}
-
-	keyUpEvent(e) {
-		var dirty = false;
-
-		if (e.which === Utils.KeyCodes.UP) {
-			if (e.shiftKey) {
-				this.rect.h -= 1;
-			} else {
-				this.rect.y -= 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.DOWN) {
-			if (e.shiftKey) {
-				this.rect.h += 1;
-			} else {
-				this.rect.y += 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.LEFT) {
-			if (e.shiftKey) {
-				this.rect.w -= 1;
-			} else {
-				this.rect.x -= 1;
-			}
-			dirty = true;
-		} else if (e.which === Utils.KeyCodes.RIGHT) {
-			if (e.shiftKey) {
-				this.rect.w += 1;
-			} else {
-				this.rect.x += 1;
-			}
-			dirty = true;
-		}
-
-		if (dirty) {
-			this.reposition();
-		}
-
-		return dirty;
-	}
-
-	keyDownEvent() {}
-	mouseMoveEvent() {}
-}
-
-Group.boxTemplate = `
-	<div class="group-box"></div>
-`;
-
-Group.optionsHtml = `
-	<table>
-		<tr>
-			<td colspan="3"><input type="text" name="group-name" placeholder="Group Name" /></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-	</table>
-`;
-Group.optionsElement = null;
-Group.boundGroup = null;
-
-Group.getOptionsElement = function() {
-	if (Group.optionsElement === null) {
-		Group.optionsElement = $(Group.optionsHtml);
-		Group.delegate();
-	}
-
-	return Group.optionsElement;
-};
-
-Group.bindTo = function(group) {
-	Group.boundGroup = group;
-};
-
-Group.delegate = function() {
-	var container = Group.optionsElement;
-
-	container.on('change', 'input[name="group-name"]', e => {
-		var newVal = $(e.target).val();
-		if (newVal.trim().length == 0) {
-			//to do Utils.Alert
-			console.log('ENTER A VALID NAME!');
-			$(e.target).focus();
-		}
-
-		Group.boundGroup.name = newVal.trim();
-	});
-};
-
-Group.updateOptions = function(group) {
-	if (Group.optionsElement === null) {
-		Group.getOptionsElement();
-	}
-	
-	Group.optionsElement.find('input[name="group-name"]').val(group.name);
-
-	Group.bindTo(group);
-};
-
 module.exports = {
-	Sprite: Sprite,
-	Group: Group,
 	Selection: Selection
-}
+};
