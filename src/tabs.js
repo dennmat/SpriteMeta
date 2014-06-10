@@ -23,7 +23,6 @@ class TabManager {
 		var active = ($.isEmptyObject(this.tabs))? 'active' : '';
 
 		this.tabs_element.append($(Mustache.to_html(this.tab_element_template, {active: active, id: id, name: name})));
-		
 		var element = $(Mustache.to_html(this.tabs_view_template, {id: id, name: name}));
 
 		if (!$.isEmptyObject(this.tabs)) { 
@@ -89,9 +88,9 @@ class TabManager {
 
 		if (tab.isEditor) {
 			tab.editor.switchToProject(id);
-			$('#editor').show();
+			tab.editor.show();
 		} else {
-			$('#editor').hide();
+			$("#editor").parent().hide(); //Hack
 			tab.element.show(); //Show pertinent
 		}
 		this.tabs_element.find('li[data-tab-id="' + id + '"]').addClass('active'); //Activate

@@ -210,6 +210,9 @@ class Selection extends Focusable {
 		}
 		this.gridSize.w = cellWidth;
 		this.gridSize.h = cellHeight;
+
+		Selection.optionsElement.find('input[name="selection-grid-width"]').val(this.gridSize.w);
+		Selection.optionsElement.find('input[name="selection-grid-height"]').val(this.gridSize.h);
 	}
 
 	resizeGrid(cw, ch) {
@@ -383,7 +386,7 @@ Selection.subSelectTemplate = `
 
 Selection.getOptionsElement = function() {
 	if (Selection.optionsElement === null) {
-		Selection.optionsElement = $(Selection.optionsHtml);
+		Selection.optionsElement = $(Mustache.to_html(Selection.optionsHtml, {}));
 
 		['grid', 'auto', 'side'].forEach(item => {
 			Selection.optionsElement.find('.selection-' + item + '-options').hide();

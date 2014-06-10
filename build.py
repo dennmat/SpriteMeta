@@ -7,8 +7,8 @@ for path, dirs, files in os.walk('src/'):
 	for f in files:
 		compiled_path = os.path.join(base_compile_path, os.path.join(path.split('src/')[1], f))
 
-		if not os.path.exists(os.path.split(compiled_path)[1]):
-			os.makedirs(os.path.split(compiled_path)[1])
+		if not os.path.exists(os.path.split(compiled_path)[0]):
+			os.makedirs(os.path.split(compiled_path)[0])
 
 		if f.endswith('.json'):
 			shutil.copyfile(os.path.join(path, f), compiled_path)

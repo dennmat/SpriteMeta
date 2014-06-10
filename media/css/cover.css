@@ -97,9 +97,12 @@ body {
   .masthead-brand {
     float: left;
   }
-  .masthead-nav {
-    float: right;
-  }
+}
+
+
+.masthead-nav {
+  float: right;
+  padding-right: 50px;
 }
 
 
@@ -109,6 +112,7 @@ body {
 
 .cover {
   padding: 0 20px;
+  height: 90%;
 }
 .cover .btn-lg {
   padding: 10px 20px;
@@ -149,13 +153,5 @@ body {
   .mastfoot,
   .cover-container {
     width: 100%; /* Must be percentage or pixels for horizontal alignment */
-  }
-}
-
-@media (min-width: 992px) {
-  .masthead,
-  .mastfoot,
-  .cover-container {
-    width: 1100px;
   }
 }

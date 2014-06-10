@@ -93,40 +93,47 @@
 				background: none repeat scroll 0 0 #444444;
 				color: white;
 			}
+
+			.top-bar, .center {
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			.top-bar {
+				height: 5%;
+				line-height: 22px;
+				padding: 0 26px;
+			}
+
+			.center {
+				height: 91%;
+			}
+
+			#editor .left-pane,
+			#editor .right-pane, 
+			#editor>div,
+			#editor,
+			.tab-views>div,
+			#view, {
+				height: 100%;
+			}
 		</style>
 	</head>
 	<body>
-		<div class="site-wrapper">
-
-			<div class="site-wrapper-inner">
-
-				<div class="cover-container">
-
-					<div class="masthead clearfix">
-						<div class="inner">
-							<h3 class="masthead-brand">Spritzup</h3>
-							<ul class="nav masthead-nav" id="tabs">
-								
-							</ul>
-						</div>
-					</div>
-				</div>
-
-				<div class="inner cover" id="view">
-					<div class="tab-views">
-
-					</div>
-				</div>
-
-				<div class="mastfoot">
-					<div class="inner">
-						<p>Spritzup 2014</p>
-					</div>
-				</div>
-
+		<div class="top-bar">
+			<div class="masthead clearfix">
+				<h3 class="masthead-brand">Spritzup</h3>
+				<ul class="nav masthead-nav" id="tabs"></ul>
 			</div>
-
 		</div>
+		<div class="center">
+			<div id="view">
+				<div class="tab-views">
+
+				</div>
+			</div>
+		</div>
+
 		<input style="display: none;" id="fileDialog" type="file" accept=".sprtr" />
 		<input style="display: none;" id="saveFileDialog" type="file" nwsaveas accept=".sprtr" />
 		<script type="text/javascript" src="../media/js/jquery-2.1.1.min.js"></script>

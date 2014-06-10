@@ -43,7 +43,6 @@
 	width: 15%;
 	background: #111;
 	min-height: 850px;
-	max-height: 850px;
 }
 
 #editor .right-pane {
@@ -52,7 +51,6 @@
 	width: 85%;
 	background: #CCC;
 	min-height: 850px;
-	max-height: 850px;
 	overflow: auto;
 	position: relative;
 }
@@ -118,4 +116,14 @@
 	margin: 15px 0 0 10px;
 	font-size: 14px;
 	font-weight: bold;
+}
+
+#editor .left-pane,
+#editor .right-pane, 
+#editor .editor-pane,
+#editor,
+.tab-views,
+.tab-views>div,
+#view {
+	height: 100%;
 }
