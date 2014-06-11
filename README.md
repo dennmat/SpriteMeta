@@ -59,4 +59,4 @@ Working on:
 Screenshots
 -----------
 ![First Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/main-5-19-2014.png "Main Screen")
-![Editor Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-5-19-2014.png "Editor Screen")
+![Editor Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-6-10-2014.png "Editor Screen")
