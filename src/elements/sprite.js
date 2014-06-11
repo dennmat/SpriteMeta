@@ -57,7 +57,10 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		return pointRect.hasIntersect(this.rect);
 	}
 
-	renderOptions() {}
+	renderOptions() {
+		Sprite.updateOptions(this);
+		return Sprite.getOptionsElement();
+	}
 
 	keyUpEvent(e) {
 		var dirty = false;
@@ -110,12 +113,20 @@ Sprite.boxTemplate = `
 Sprite.optionsHtml = `
 	<table>
 		<tr>
-			<td colspan="3">Sprite Test</td>
+			<td>Left: </td>
+			<td><input type="text" name="sprite-options-left" /></td>
 		</tr>
 		<tr>
-			<td>Width: </td><td><input type="text" name="sprite-options-width" /></td>
-			<td>Height: </td><td><input type="text" name="sprite-options-height" /></td>
-			<td></td>
+			<td>Top: </td>
+			<td><input type="text" name="sprite-options-top" /></td>
+		</tr>
+		<tr>
+			<td>Width: </td>
+			<td><input type="text" name="sprite-options-width" /></td>
+		</tr>
+		<tr>
+			<td>Height: </td>
+			<td><input type="text" name="sprite-options-height" /></td>
 		</tr>
 	</table>
 `;
@@ -151,6 +162,13 @@ Sprite.updateOptions = function(sprite) {
 	if (Sprite.optionsElement === null) {
 		Sprite.getOptionsElement();
 	}
+
+	var element = Sprite.optionsElement;
+
+	element.find('input[name="sprite-options-left"]').val(sprite.rect.x);
+	element.find('input[name="sprite-options-top"]').val(sprite.rect.y);
+	element.find('input[name="sprite-options-width"]').val(sprite.rect.w);
+	element.find('input[name="sprite-options-height"]').val(sprite.rect.h);
 
 	Sprite.bindTo(sprite);
 };
