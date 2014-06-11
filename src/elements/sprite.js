@@ -20,7 +20,7 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		var screen_pos = this.rect.copy();
 		screen_pos.adjustToZoom(this.editor.zoom);
 
-		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		var adjusted_pos = this.editor.activeProject.imagePosToRelativePos(screen_pos.x, screen_pos.y);
 		adjusted_pos.w = screen_pos.w;
 		adjusted_pos.h = screen_pos.h;
 
@@ -39,6 +39,9 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		var container = this.editor.getEditorContainer();
 
 		this.element = $(Mustache.to_html(Sprite.boxTemplate, {}));
+
+		this.uid = Sprite.uidCounter++;
+		this.element.attr('data-uid', this.uid);
 
 		this.reposition();
 
@@ -110,8 +113,8 @@ Sprite.optionsHtml = `
 			<td colspan="3">Sprite Test</td>
 		</tr>
 		<tr>
-			<td></td>
-			<td></td>
+			<td>Width: </td><td><input type="text" name="sprite-options-width" /></td>
+			<td>Height: </td><td><input type="text" name="sprite-options-height" /></td>
 			<td></td>
 		</tr>
 	</table>
@@ -134,6 +137,14 @@ Sprite.bindTo = function(sprite) {
 
 Sprite.delegate = function() {
 	var container = Sprite.optionsElement;
+
+	//container.on('keyup', '.sprite-options-width', e => {
+
+	//});
+
+	//container.on('keyup', '.sprite-options-height', e => {
+
+	//});
 };
 
 Sprite.updateOptions = function(sprite) {
@@ -143,6 +154,8 @@ Sprite.updateOptions = function(sprite) {
 
 	Sprite.bindTo(sprite);
 };
+
+Sprite.uidCounter = 0;
 
 module.exports = {
 	Sprite: Sprite

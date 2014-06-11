@@ -34,6 +34,13 @@ class Rect {
 		);
 	}
 
+	pointInRect(x, y) {
+		return (
+			this.x <= x && x <= this.x2 &&
+			this.y <= y && y <= this.y2
+		);
+	}
+
 	removeZoom(zoom) {
 		this.x /= parseFloat(zoom);
 		this.y /= parseFloat(zoom);

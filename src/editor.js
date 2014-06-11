@@ -10,7 +10,7 @@ class Editor {
 		this.tab_manager = tab_manager;
 
 		this.projects = [];
-		this.active_project = null;
+		this.activeProject = null;
 
 		this.container = container;
 
@@ -38,7 +38,7 @@ class Editor {
 			this.image_holder = this.element.find('.image-holder');
 			this.image_element = this.image_holder.find('img');
 
-			if (this.active_project === null) {
+			if (this.activeProject === null) {
 				this.image_holder.hide();
 				this.blank_element.show();
 			}
@@ -96,7 +96,7 @@ class Editor {
 
 		var current_pos = this.image_element.position();
 		
-		this.active_project.setImagePosition(current_pos.left + deltaX, current_pos.top + deltaY);
+		this.activeProject.setImagePosition(current_pos.left + deltaX, current_pos.top + deltaY);
 
 		this.setPos(deltaX, deltaY);
 
@@ -119,7 +119,7 @@ class Editor {
 		var adjustedRegion = this.selectionRegion.copy();
 		adjustedRegion.adjustToZoom(this.zoom);
 
-		var adjustedPos = this.active_project.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
+		var adjustedPos = this.activeProject.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
 		adjustedPos.w = adjustedRegion.w;
 		adjustedPos.h = adjustedRegion.h;
 
@@ -215,7 +215,7 @@ class Editor {
 			Utils.openDialog(d => {
 				var path = $(d.target).val();
 
-				this.active_project.path = path;
+				this.activeProject.path = path;
 				this.resetImage();
 			}, '.jpg, .jpeg, .png, .gif, .bmp');
 		});
@@ -250,18 +250,18 @@ class Editor {
 						var adjustedRegion = this.selectionRegion.copy();
 						adjustedRegion.adjustToZoom(this.zoom);
 
-						var adjustedPos = this.active_project.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
+						var adjustedPos = this.activeProject.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
 						adjustedPos.w = adjustedRegion.w;
 						adjustedPos.h = adjustedRegion.h;
 
 						var w = (we.pageX - relative.left) - adjustedPos.x;
 						var h = ((we.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
 
-						if (w > this.active_project.baseDimensions.w) {
-							w = this.active_project.baseDimensions.w;
+						if (w > this.activeProject.baseDimensions.w) {
+							w = this.activeProject.baseDimensions.w;
 						}
-						if (h > this.active_project.baseDimensions.h) {
-							h = this.active_project.baseDimensions.h;
+						if (h > this.activeProject.baseDimensions.h) {
+							h = this.activeProject.baseDimensions.h;
 						}
 
 						this.selection.setDimensions(w, h);
@@ -269,7 +269,7 @@ class Editor {
 						this.selecting = true;
 						
 						var region = new Utils.Rect(e.pageX - relative.left, (e.pageY - relative.top) + container.get(0).scrollTop);
-						var adjustedPos = this.active_project.relativePosToImagePos(region.x, region.y);
+						var adjustedPos = this.activeProject.relativePosToImagePos(region.x, region.y);
 						
 						adjustedPos.w = region.w;
 						adjustedPos.h = region.h;
@@ -293,6 +293,7 @@ class Editor {
 				this.handleDrag(e);
 			} else if (this.selecting) {
 				this.handleSelection(e);
+			} else {
 			}
 
 		});
@@ -326,7 +327,7 @@ class Editor {
 
 				this.zoom = parseFloat(this.zoom.toFixed(2));
 
-				this.active_project.editorInfo.zoom = this.zoom;
+				this.activeProject.editorInfo.zoom = this.zoom;
 
 				this.setZoom(currentZoom);
 				
@@ -351,11 +352,20 @@ class Editor {
 			});
 		});
 
+		this.element.on('click', '.sprite-box', e => {
+			e.preventDefault();
+			
+			var spriteBox = $(e.target);
+
+			var sprite = this.activeProject.getSpriteByUID(spriteBox.data('uid'));
+
+			this.focus(sprite);
+		});
 	}
 
 	loadedImage() {
-		if (this.active_project !== null) {
-			this.active_project.setDimensions(
+		if (this.activeProject !== null) {
+			this.activeProject.setDimensions(
 				new Utils.Rect(
 					0, 0, 
 					this.image_element[0].naturalWidth, 
@@ -366,7 +376,7 @@ class Editor {
 	}
 
 	setPos(deltaX, deltaY) {
-		var info = this.active_project.editorInfo;
+		var info = this.activeProject.editorInfo;
 
 		this.image_element.css({
 			left: info.pos.x.toString() + 'px',
@@ -377,14 +387,14 @@ class Editor {
 			this.selection.reposition();
 		}
 
-		this.active_project.update();
+		this.activeProject.update();
 	}
 
 	setZoom(previousZoom) {
-		var info = this.active_project.editorInfo;
+		var info = this.activeProject.editorInfo;
 
-		var newWidth = this.active_project.baseDimensions.w * info.zoom;
-		var newHeight = this.active_project.baseDimensions.h * info.zoom;
+		var newWidth = this.activeProject.baseDimensions.w * info.zoom;
+		var newHeight = this.activeProject.baseDimensions.h * info.zoom;
 
 		this.image_element.css({
 			width: newWidth.toString() + 'px',
@@ -395,22 +405,22 @@ class Editor {
 			this.selection.reposition();
 		}
 
-		this.active_project.update();
+		this.activeProject.update();
 	}
 
 	reload() {
-		if (this.active_project == null) {
+		if (this.activeProject == null) {
 			return;
 		}
 
-		if (this.active_project.path === null || this.active_project.path.length === 0) {
+		if (this.activeProject.path === null || this.activeProject.path.length === 0) {
 			this.image_holder.hide();
 			this.blank_element.show();
 		} else {
 			this.resetImage();
 		}
 
-		this.zoom = this.active_project.editorInfo.zoom;
+		this.zoom = this.activeProject.editorInfo.zoom;
 
 		this.setPos();
 		this.setZoom();
@@ -431,14 +441,14 @@ class Editor {
 	switchToProject(id) {
 		var proj = this.getProjectById(id);
 
-		this.active_project = proj;
+		this.activeProject = proj;
 		this.reload();
 	}
 
 	resetImage() {
 		var newImg = $('<img>').one("load", e => {
 			this.loadedImage();
-		}).attr('src', this.active_project.path);
+		}).attr('src', this.activeProject.path);
 
 		this.image_element.remove();
 		this.image_element = null;
@@ -469,17 +479,17 @@ class Editor {
 	}
 
 	saveFile(save_as=false) {
-		if (this.active_project === null) {
+		if (this.activeProject === null) {
 			return;
 		}
 
-		if (this.active_project.spriter_path !== null && !save_as) {
-			this.active_project.saveProject();
+		if (this.activeProject.spriter_path !== null && !save_as) {
+			this.activeProject.saveProject();
 		} else {
 			Utils.saveDialog(e => {
 				var destination = $(e.target).val();
 
-				this.active_project.saveProject(destination, this.postSave.bind(this));
+				this.activeProject.saveProject(destination, this.postSave.bind(this));
 			});
 		}
 	}
@@ -495,7 +505,7 @@ class Editor {
 	}
 
 	postSave() {
-		this.tab_manager.updateTabName(this.active_project.id, this.active_project.name);
+		this.tab_manager.updateTabName(this.activeProject.id, this.activeProject.name);
 	}
 
 	exportFile() {

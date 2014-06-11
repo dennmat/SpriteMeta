@@ -97,6 +97,16 @@ class Project {
 		this.markDirty(true);
 	}
 
+	getSpriteByUID(uid) {
+		for (var sprite of this.sprites) {
+			if (sprite.uid === parseInt(uid)) {
+				return sprite;
+			}
+		}
+
+		return null;
+	}
+
 	serializeGroups() {
 		var result = {};
 

@@ -72,11 +72,11 @@ class Selection extends Focusable {
 		var screenPos = this.rect.copy();
 		screenPos.adjustToZoom(this.editor.zoom);
 
-		var adjustedPos = this.editor.active_project.imagePosToRelativePos(screenPos.x, screenPos.y);
+		var adjustedPos = this.editor.activeProject.imagePosToRelativePos(screenPos.x, screenPos.y);
 		adjustedPos.w = screenPos.w;
 		adjustedPos.h = screenPos.h;
 
-		var imagePosition = this.editor.active_project.getImagePosition();
+		var imagePosition = this.editor.activeProject.getImagePosition();
 
 		this.element.css(adjustedPos.toCss());
 

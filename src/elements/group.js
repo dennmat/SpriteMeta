@@ -47,7 +47,7 @@ class Group extends (Base.Element, Base.Focusable) {
 		var screen_pos = this.rect.copy();
 		screen_pos.adjustToZoom(this.editor.zoom);
 
-		var adjusted_pos = this.editor.active_project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		var adjusted_pos = this.editor.activeProject.imagePosToRelativePos(screen_pos.x, screen_pos.y);
 		adjusted_pos.w = screen_pos.w;
 		adjusted_pos.h = screen_pos.h;
 

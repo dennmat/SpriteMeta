@@ -49,7 +49,7 @@ class GroupTool extends Tool {
 
 	handle(editor) {
 		var selection = editor.selection;
-		var project = editor.active_project;
+		var project = editor.activeProject;
 
 		var group = new Elements.Group(editor, {
 			rect: selection.rect.copy()
@@ -76,7 +76,7 @@ class SpriteTool extends Tool {
 
 	handle(editor) {
 		var selection = editor.selection;
-		var project = editor.active_project;
+		var project = editor.activeProject;
 
 		var sprites = selection.getSelections();
 		

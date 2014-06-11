@@ -37,6 +37,10 @@
 	background: rgba(255, 200, 200, .4);
 }
 
+#editor .sprite-box.focused {
+	background: rgba(200, 255, 200, .8);
+}
+
 #editor .left-pane {
 	box-sizing: border-box;
 	float: left;

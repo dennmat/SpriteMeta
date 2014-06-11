@@ -24,10 +24,12 @@ class Focusable {
 	}
 
 	receiveFocus() {
+		this.element.addClass('focused');
 		this.hasFocus = true;
 	}
 
 	blur() {
+		this.element.removeClass('focused');
 		this.hasFocus = false;
 	}
 
