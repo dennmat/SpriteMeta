@@ -5,6 +5,11 @@ var Project = require('./project.js');
 var Elements = require('./elements');
 var Tools = require('./tools.js');
 
+//WTF
+function Image() {
+	return window.document.createElement("img");
+}
+
 class Editor {
 	constructor(container, tab_manager) {
 		this.tab_manager = tab_manager;
@@ -24,9 +29,13 @@ class Editor {
 		this.selectionRegion = null;
 		this.selection = null;
 
+		this.mousePos = new Utils.Rect();
+
 		this.tools = new Tools();
 
 		this.focusedElement = null;
+
+		this.image_object = null;
 
 		this.element = null;
 		this.build();
@@ -36,6 +45,7 @@ class Editor {
 		this.element = $('<div></div>').load('editor.html', () => {
 			this.blank_element = this.element.find('.blank');
 			this.image_holder = this.element.find('.image-holder');
+			this.image_canvas = this.image_holder.find('.image-canvas');
 			this.image_element = this.image_holder.find('img');
 
 			if (this.activeProject === null) {
@@ -58,7 +68,7 @@ class Editor {
 	updateStatus() {
 		var right_side = this.element.find('.status-bar .right-side');
 
-		right_side.text('Zoom: ' + parseInt(this.zoom*100).toString() + '%');
+		right_side.text('Zoom: ' + parseInt(this.zoom*100).toString() + '%' + ' Mouse: (' + this.mousePos.x + ', ' + this.mousePos.y + ')');
 	}
 
 	hide() {
@@ -105,6 +115,7 @@ class Editor {
 
 	handleSelection(e) {
 		var wasSelecting = this.selecting;
+		var info = this.activeProject.editorInfo;
 		this.selecting = false;
 
 		$(window).unbind("mousemove");
@@ -125,6 +136,12 @@ class Editor {
 
 		var w = (e.pageX - relative.left) - adjustedPos.x;
 		var h = ((e.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
+
+		w /= info.zoom;
+		h /= info.zoom;
+
+		w = Math.floor(w) + 1;
+		h = Math.floor(h) + 1;
 
 		this.selection.setDimensions(w, h);
 
@@ -169,6 +186,7 @@ class Editor {
 			return;
 		}
 
+		this.element.find('.tool-options').empty();
 		this.element.find('.tool-options').append(this.focusedElement.renderOptions());
 	}
 
@@ -222,7 +240,7 @@ class Editor {
 
 		this.element.on('mousedown', '.image-holder', e => {
 			e.preventDefault();
-
+			
 			if (e.shiftKey) {
 
 				$(window).mousemove(we => {
@@ -247,6 +265,7 @@ class Editor {
 					var relative = container.offset();
 					
 					if (this.selecting) {
+						var info = this.activeProject.editorInfo;
 						var adjustedRegion = this.selectionRegion.copy();
 						adjustedRegion.adjustToZoom(this.zoom);
 
@@ -256,6 +275,12 @@ class Editor {
 
 						var w = (we.pageX - relative.left) - adjustedPos.x;
 						var h = ((we.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
+						
+						w /= info.zoom;
+						h /= info.zoom;
+
+						w = Math.floor(w) + 1;
+						h = Math.floor(h) + 1;
 
 						if (w > this.activeProject.baseDimensions.w) {
 							w = this.activeProject.baseDimensions.w;
@@ -263,12 +288,16 @@ class Editor {
 						if (h > this.activeProject.baseDimensions.h) {
 							h = this.activeProject.baseDimensions.h;
 						}
-
+						
 						this.selection.setDimensions(w, h);
 					} else {
+						var info = this.activeProject.editorInfo;
 						this.selecting = true;
+
+						var x = parseInt((e.pageX - relative.left) / info.zoom) * info.zoom;
+						var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
 						
-						var region = new Utils.Rect(e.pageX - relative.left, (e.pageY - relative.top) + container.get(0).scrollTop);
+						var region = new Utils.Rect(x, y);
 						var adjustedPos = this.activeProject.relativePosToImagePos(region.x, region.y);
 						
 						adjustedPos.w = region.w;
@@ -278,7 +307,7 @@ class Editor {
 
 						this.selectionRegion = adjustedPos;
 						this.selection = new Elements.Selection(this, this.selectionRegion);
-						console.log(this.selection);
+						
 						this.focus(this.selection);
 					}
 				});
@@ -286,16 +315,15 @@ class Editor {
 			}
 		});
 		
-		this.element.on('mouseup', '.image-holder', e => {
+		this.element.on('mouseup', '.image-holder,.selection,.pointer', e => {
 			e.preventDefault();
-
+			
 			if (this.dragging) {
 				this.handleDrag(e);
-			} else if (this.selecting) {
-				this.handleSelection(e);
-			} else {
 			}
-
+			if (this.selecting) {
+				this.handleSelection(e);
+			}
 		});
 		
 		this.element.on('mousewheel', '.right-pane', e => {
@@ -314,15 +342,15 @@ class Editor {
 				var currentZoom = this.zoom;
 
 				if (wd < 0) { //Down
-					this.zoom -= Math.abs(wd)/500;
+					this.zoom -= Math.abs(wd)/1000;
 				} else { //Up
-					this.zoom += Math.abs(wd)/500;
+					this.zoom += Math.abs(wd)/1000;
 				}
 
 				if (this.zoom <= 0) {
 					this.zoom = 0.1;
-				} else if (this.zoom > 5) {
-					this.zoom = 5;
+				} else if (this.zoom > 10) {
+					this.zoom = 10;
 				}
 
 				this.zoom = parseFloat(this.zoom.toFixed(2));
@@ -352,8 +380,28 @@ class Editor {
 			});
 		});
 
+		$('body').on('mousemove', '.image-holder', e=> {
+			var container = this.getEditorContainer();
+			var relative = container.offset();
+			var info = this.activeProject.editorInfo;
+			
+			var pointer = this.container.find('.pointer');
+			var x = parseInt((e.pageX - relative.left) / info.zoom) * info.zoom;
+			var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
+
+			this.mousePos.x = parseInt(x/info.zoom);
+			this.mousePos.y = parseInt(y/info.zoom);
+
+			pointer.css({
+				left: x,
+				top: y
+			});
+
+			this.updateStatus();
+		});
+
 		this.element.on('click', '.sprite-box', e => {
-			e.preventDefault();
+			//e.preventDefault();
 			
 			var spriteBox = $(e.target);
 
@@ -368,8 +416,8 @@ class Editor {
 			this.activeProject.setDimensions(
 				new Utils.Rect(
 					0, 0, 
-					this.image_element[0].naturalWidth, 
-					this.image_element[0].naturalHeight
+					this.image_object.naturalWidth, 
+					this.image_object.naturalHeight
 				)
 			);
 		}
@@ -396,10 +444,24 @@ class Editor {
 		var newWidth = this.activeProject.baseDimensions.w * info.zoom;
 		var newHeight = this.activeProject.baseDimensions.h * info.zoom;
 
-		this.image_element.css({
+		/*this.image_element.css({
 			width: newWidth.toString() + 'px',
 			height: newHeight.toString() + 'px'
+		});*/
+		this.image_canvas.attr('width', newWidth);
+		this.image_canvas.attr('height', newHeight);
+
+		this.element.find('.pointer').css({
+			width: info.zoom,
+			height: info.zoom
 		});
+
+		if (this.image_object !== null) {
+			var ctx = this.image_canvas[0].getContext("2d");
+			ctx.imageSmoothingEnabled = false;
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.drawImage(this.image_object, 0, 0, newWidth, newHeight);
+		}
 
 		if (this.selection !== null) { //Temporary
 			this.selection.reposition();
@@ -446,7 +508,7 @@ class Editor {
 	}
 
 	resetImage() {
-		var newImg = $('<img>').one("load", e => {
+		/*var newImg = $('<img>').one("load", e => {
 			this.loadedImage();
 		}).attr('src', this.activeProject.path);
 
@@ -454,7 +516,21 @@ class Editor {
 		this.image_element = null;
 
 		this.image_element = newImg;
-		this.image_element.appendTo(this.image_holder);
+		this.image_element.appendTo(this.image_holder);*/
+
+		this.image_object = Image();
+		this.image_object.onload = () => {
+			this.image_canvas.attr('width', this.image_object.naturalWidth);
+			this.image_canvas.attr('height', this.image_object.naturalHeight);
+
+			this.loadedImage();
+
+			var ctx = this.image_canvas[0].getContext("2d");
+			ctx.imageSmoothingEnabled = false;
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.drawImage(this.image_object, 0, 0);
+		};
+		this.image_object.src = this.activeProject.path;
 
 		this.image_holder.show();
 		this.blank_element.hide();

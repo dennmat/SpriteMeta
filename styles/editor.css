@@ -8,6 +8,8 @@
 	background: rgba(150, 150, 255, .4);
 	min-width: 1px;
 	min-height: 1px;
+	
+	box-sizing: border-box;
 
 	position: absolute;
 	top: 0;
@@ -130,4 +132,22 @@
 .tab-views>div,
 #view {
 	height: 100%;
+}
+
+#editor canvas {
+	display: block;
+	image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+}
+
+#editor .pointer {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 1px solid #FFF;
+	background: #F00;
+	width: 1px;
+	height: 1px;
+	box-sizing: border-box;
 }

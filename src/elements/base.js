@@ -37,6 +37,8 @@ class Focusable {
 
 	renderOptions() {}
 
+	blurOptions() {}
+
 	acceptEvent(type, event) {
 		switch(type) {
 			case Focusable.KeyDownEvent:

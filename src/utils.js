@@ -23,11 +23,18 @@ class Rect {
 		this.y2 = this.y + this.h;
 	}
 
+	updateDeltas() {
+		this.x2 = this.x + this.w;
+		this.y2 = this.y + this.h;
+	}
+
 	toDict() {
+		this.updateDeltas();
 		return {x:this.x, y:this.y, w:this.w, h:this.h};
 	}
 
 	hasIntersect(other_rect) {
+		this.updateDeltas();
 		return !!(
 			this.x < other_rect.x2 && this.x2 > other_rect.x &&
 			this.y < other_rect.y2 && this.y2 > other_rect.y
@@ -35,6 +42,7 @@ class Rect {
 	}
 
 	pointInRect(x, y) {
+		this.updateDeltas();
 		return (
 			this.x <= x && x <= this.x2 &&
 			this.y <= y && y <= this.y2
@@ -46,6 +54,7 @@ class Rect {
 		this.y /= parseFloat(zoom);
 		this.w /= parseFloat(zoom);
 		this.h /= parseFloat(zoom);
+		this.updateDeltas();
 	}
 
 	adjustToZoom(zoom) {
@@ -53,6 +62,7 @@ class Rect {
 		this.y *= parseFloat(zoom);
 		this.w *= parseFloat(zoom);
 		this.h *= parseFloat(zoom);
+		this.updateDeltas();
 	}
 
 	add(otherRect) {
@@ -60,7 +70,7 @@ class Rect {
 		this.y += otherRect.y;
 		this.w += otherRect.w;
 		this.h += otherRect.h;
-
+		this.updateDeltas();
 		return this;
 	}
 
@@ -69,11 +79,12 @@ class Rect {
 		this.y -= otherRect.y;
 		this.w -= otherRect.w;
 		this.h -= otherRect.h;
-
+		this.updateDeltas();
 		return this;
 	}
 
 	toCss() {
+		this.updateDeltas();
 		return {
 			left: this.x.toString() + 'px',
 			top: this.y.toString() + 'px',

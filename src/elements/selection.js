@@ -24,6 +24,7 @@ class Selection extends Focusable {
 
 		//Selection Type Data
 		this.gridSize = new Utils.Rect();
+		this.spacing = 0;
 
 		this.build();
 	}
@@ -75,8 +76,7 @@ class Selection extends Focusable {
 		var adjustedPos = this.editor.activeProject.imagePosToRelativePos(screenPos.x, screenPos.y);
 		adjustedPos.w = screenPos.w;
 		adjustedPos.h = screenPos.h;
-
-		var imagePosition = this.editor.activeProject.getImagePosition();
+		//var imagePosition = this.editor.activeProject.getImagePosition();
 
 		this.element.css(adjustedPos.toCss());
 
@@ -89,10 +89,9 @@ class Selection extends Focusable {
 		//Gotta preserve x,y in this case. because it's essentially treated as a new position that isn't shifting an existing value
 		var oldx = tempRect.x;
 		var oldy = tempRect.y;
-		tempRect.removeZoom(this.editor.zoom);
+		//tempRect.removeZoom(this.editor.zoom);
 		tempRect.x = oldx;
 		tempRect.y = oldy;
-
 
 		this.rect = tempRect;
 
@@ -211,8 +210,9 @@ class Selection extends Focusable {
 		this.gridSize.w = cellWidth;
 		this.gridSize.h = cellHeight;
 
-		Selection.optionsElement.find('input[name="selection-grid-width"]').val(this.gridSize.w);
+	Selection.optionsElement.find('input[name="selection-grid-width"]').val(this.gridSize.w);
 		Selection.optionsElement.find('input[name="selection-grid-height"]').val(this.gridSize.h);
+		Selection.optionsElement.find('input[name="selection-grid-spacing"]').val(this.spacing);
 	}
 
 	resizeGrid(cw, ch) {
@@ -224,10 +224,12 @@ class Selection extends Focusable {
 
 		this.clearSubSelects();
 
+		var spacing = this.spacing;
+
 		for (var r = 0; r < numRows; r++) {
-			var y = r * ch;
+			var y = r * ch + (r * spacing);
 			for (var c = 0; c < numCols; c++) {
-				var x = c * cw;
+				var x = c * cw + (c * spacing);
 				this.addSubSelect(new Utils.Rect(x, y, cw, ch));
 			}
 		}
@@ -374,6 +376,9 @@ Selection.optionsHtml = `
 		<tr class="selection-grid-options">
 			<td>Height: </td><td><input name="selection-grid-height" placeholder="Cell Height" type="text" /></td>
 		</tr>
+		<tr class="selection-grid-options">
+			<td>Spacing: </td><td><input name="selection-grid-spacing" placeholder="Cell Spacing" type="text" /></td>
+		</tr>
 	</table>
 `;
 Selection.optionsElement = null;
@@ -442,6 +447,18 @@ Selection.GridHeightKeyUp = function(e) {
 	}
 };
 
+Selection.GridSpacingKeyUp = function(e) {
+	var container = Selection.optionsElement;
+
+	var ns = parseInt(container.find('input[name="selection-grid-spacing"]').val());
+
+	if (!isNaN(ns)) {
+		var sel = Selection.boundSelection;
+		sel.spacing = ns;
+		Selection.boundSelection.resizeGrid(sel.gridSize.w, sel.gridSize.h);
+	}
+}
+
 //Would love to eventually rework all this
 //Makes it so theres a timeout before attempting to render, make sure the user is done typing
 //Might change to enter key validation
@@ -478,6 +495,7 @@ Selection.delegate = function() {
 	//Grid Mode
 	container.on('keyup', 'input[name="selection-grid-width"]', Selection.setUpKeyUpEvent(Selection.GridWidthKeyUp));
 	container.on('keyup', 'input[name="selection-grid-height"]', Selection.setUpKeyUpEvent(Selection.GridHeightKeyUp));
+	container.on('keyup', 'input[name="selection-grid-spacing"]', Selection.setUpKeyUpEvent(Selection.GridSpacingKeyUp));
 };
 
 Selection.updateOptions = function(selection) {

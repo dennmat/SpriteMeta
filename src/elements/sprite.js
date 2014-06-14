@@ -156,6 +156,54 @@ Sprite.delegate = function() {
 	//container.on('keyup', '.sprite-options-height', e => {
 
 	//});
+
+	container.on('keyup', 'input[name="sprite-options-left"]', e => {
+		var sprite = Sprite.boundSprite;
+
+		var newX = parseInt($(e.target).val());
+
+		if (!isNaN(newX)) {
+			sprite.rect.x = newX;
+		}
+		
+		sprite.reposition();
+	});
+
+	container.on('keyup', 'input[name="sprite-options-top"]', e => {
+		var sprite = Sprite.boundSprite;
+
+		var newY = parseInt($(e.target).val());
+
+		if (!isNaN(newY)) {
+			sprite.rect.y = newY;
+		}
+
+		sprite.reposition();
+	});
+	
+	container.on('keyup', 'input[name="sprite-options-width"]', e => {
+		var sprite = Sprite.boundSprite;
+
+		var newW = parseInt($(e.target).val());
+
+		if (!isNaN(newW)) {
+			sprite.rect.w = newW;
+		}
+
+		sprite.reposition();
+	});
+
+	container.on('keyup', 'input[name="sprite-options-height"]', e => {
+		var sprite = Sprite.boundSprite;
+
+		var newH = parseInt($(e.target).val());
+
+		if (!isNaN(newH)) {
+			sprite.rect.h = newH;
+		}
+
+		sprite.reposition();
+	});
 };
 
 Sprite.updateOptions = function(sprite) {
