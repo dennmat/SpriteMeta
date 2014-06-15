@@ -5,9 +5,10 @@ var Utils = require('../utils.js');
 var Mustache = require('mustache');
 
 class Sprite extends (Base.Element, Base.Focusable) {
-	constructor(editor, info) {
-		this.editor = editor;
+	constructor(project, info) {
+		this.project = project;
 		this.rect = null;
+		this.name = 'Sprite #' + Sprite.SpriteCount++;
 
 		if (info !== undefined) {
 			this.load(info);
@@ -18,9 +19,9 @@ class Sprite extends (Base.Element, Base.Focusable) {
 
 	reposition() {
 		var screen_pos = this.rect.copy();
-		screen_pos.adjustToZoom(this.editor.zoom);
+		screen_pos.adjustToZoom(this.project.editorInfo.zoom);
 
-		var adjusted_pos = this.editor.activeProject.imagePosToRelativePos(screen_pos.x, screen_pos.y);
+		var adjusted_pos = this.project.imagePosToRelativePos(screen_pos.x, screen_pos.y);
 		adjusted_pos.w = screen_pos.w;
 		adjusted_pos.h = screen_pos.h;
 
@@ -33,10 +34,14 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		} else {
 			this.rect = new Utils.Rect();
 		}
+
+		if (info.name !== undefined) {
+			this.name = info.name;
+		}
 	}
 
 	build() {
-		var container = this.editor.getEditorContainer();
+		var container = this.project.editor.getEditorContainer();
 
 		this.element = $(Mustache.to_html(Sprite.boxTemplate, {}));
 
@@ -49,7 +54,14 @@ class Sprite extends (Base.Element, Base.Focusable) {
 	}
 
 	serialize() {
+		return {
+			rect: this.rect.toDict(),
+			name: this.name
+		}
+	}
 
+	destroy() {
+		this.element.remove();
 	}
 
 	inBounds(x, y) {
@@ -113,6 +125,10 @@ Sprite.boxTemplate = `
 Sprite.optionsHtml = `
 	<table>
 		<tr>
+			<td>Name: </td>
+			<td><input type="text" name="sprite-options-name" /></td>
+		</tr>
+		<tr>
 			<td>Left: </td>
 			<td><input type="text" name="sprite-options-left" /></td>
 		</tr>
@@ -128,10 +144,14 @@ Sprite.optionsHtml = `
 			<td>Height: </td>
 			<td><input type="text" name="sprite-options-height" /></td>
 		</tr>
+		<tr>
+			<td colspan="2"><a href="#" class="sprite-options-delete button red"><i class="icon-minus-sign"></i>Delete Sprite</a></td>
+		</tr>
 	</table>
 `;
 Sprite.optionsElement = null;
 Sprite.boundSprite = null;
+Sprite.SpriteCount = 0;
 
 Sprite.getOptionsElement = function() {
 	if (Sprite.optionsElement === null) {
@@ -156,6 +176,21 @@ Sprite.delegate = function() {
 	//container.on('keyup', '.sprite-options-height', e => {
 
 	//});
+
+	container.on('click', 'a.sprite-options-delete', e => {
+		e.preventDefault();
+
+		var sprite = Sprite.boundSprite;
+		sprite.project.deleteSprite(sprite);
+
+		Sprite.boundSprite = null;
+		sprite.project.editor.clearFocus();
+		sprite = null;
+	});
+
+	container.on('keyup', 'input[name="sprite-options-name"]', e => {
+		Sprite.boundSprite.name = $(e.target).val();
+	});
 
 	container.on('keyup', 'input[name="sprite-options-left"]', e => {
 		var sprite = Sprite.boundSprite;
@@ -213,6 +248,7 @@ Sprite.updateOptions = function(sprite) {
 
 	var element = Sprite.optionsElement;
 
+	element.find('input[name="sprite-options-name"]').val(sprite.name);
 	element.find('input[name="sprite-options-left"]').val(sprite.rect.x);
 	element.find('input[name="sprite-options-top"]').val(sprite.rect.y);
 	element.find('input[name="sprite-options-width"]').val(sprite.rect.w);

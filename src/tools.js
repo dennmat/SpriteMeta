@@ -82,7 +82,7 @@ class SpriteTool extends Tool {
 		
 		var spriteObj = null;
 		for (var sprite of sprites) {
-			spriteObj = new Elements.Sprite(editor, {
+			spriteObj = new Elements.Sprite(project, {
 				rect: sprite.rect
 			});
 			project.addSprite(spriteObj);

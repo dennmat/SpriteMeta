@@ -43,7 +43,10 @@ class Project {
 
 		if (data.sprites) {
 			for (var sprite of data.sprites) {
-				var spriteObj = new Elements.Sprite(this.editor, {rect: new Utils.Rect().fromDict(sprite.rect)});
+				var spriteObj = new Elements.Sprite(this, {
+					rect: new Utils.Rect().fromDict(sprite.rect),
+					name: sprite.name
+				});
 				this.addSprite(spriteObj, false);
 			}
 		}
@@ -127,6 +130,13 @@ class Project {
 		return null;
 	}
 
+	deleteSprite(sprite) {
+		sprite.destroy();
+
+		var idx = this.sprites.indexOf(sprite);
+		this.sprites.splice(idx,1);
+	}
+
 	serializeGroups() {
 		var result = {};
 
@@ -140,13 +150,10 @@ class Project {
 	}
 
 	serializeSprites() {
-		//return []; // [{region: sprite.region.toDict()} for (sprite of this.sprites)];
 		var sprites = [];
 
 		for (var sprite of this.sprites) {
-			sprites.push({
-				rect: sprite.rect.toDict()
-			});
+			sprites.push(sprite.serialize());
 		}
 
 		return sprites;
