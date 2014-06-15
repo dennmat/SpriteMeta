@@ -175,6 +175,7 @@ Group.updateOptions = function(group) {
 	Group.optionsElement.find('input[name="group-name"]').val(group.name);
 
 	Group.bindTo(group);
+	//Group.delegate();
 };
 
 module.exports = {

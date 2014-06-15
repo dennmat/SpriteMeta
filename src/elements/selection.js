@@ -483,6 +483,7 @@ Selection.delegate = function() {
 	var container = Selection.optionsElement;
 
 	container.on('click', '.selection-grid-mode', e => {
+		console.log("GOING TO GRID MODE", Selection.boundSelection);
 		Selection.boundSelection.setMode(Selection.Modes.Grid);
 	});
 	container.on('click', '.selection-auto-mode', e => {
@@ -509,6 +510,8 @@ Selection.updateOptions = function(selection) {
 	['grid', 'auto', 'side'].forEach(item => {
 		Selection.optionsElement.find('.selection-' + item + '-options').hide();
 	});
+
+	Selection.delegate();
 };
 
 module.exports = {

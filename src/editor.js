@@ -228,6 +228,11 @@ class Editor {
 			this.saveFile();
 		});
 
+		this.element.on('click', '.editor-export-spriter', e => {
+			e.preventDefault();
+			this.exportProject();
+		});
+
 		this.element.on('click', '.editor-load-spritesheet', e => {
 			e.preventDefault();
 			Utils.openDialog(d => {
@@ -441,9 +446,6 @@ class Editor {
 	setZoom(previousZoom) {
 		var info = this.activeProject.editorInfo;
 
-		console.log("Setting Zoom", info.zoom);
-		console.log("D", this.activeProject.baseDimensions.w, this.activeProject.baseDimensions.h);
-
 		var newWidth = this.activeProject.baseDimensions.w * info.zoom;
 		var newHeight = this.activeProject.baseDimensions.h * info.zoom;
 
@@ -558,6 +560,18 @@ class Editor {
 				this.activeProject.saveProject(destination, this.postSave.bind(this));
 			});
 		}
+	}
+
+	exportProject() {
+		if (this.activeProject === null) {
+			return;
+		}
+
+		Utils.saveDialog(e => {
+			var destination = $(e.target).val();
+
+			this.activeProject.exportProject(destination);
+		}, '.json');
 	}
 
 	updateDirty(project_id) {

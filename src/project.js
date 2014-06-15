@@ -9,6 +9,8 @@ class Project {
 		this.editor = editor;
 		this.id = Project.getUID();
 
+		this.path = null;
+
 		this.spriter_path = spriter_path;
 		this.name = "Untitled " + this.id.toString();
 
@@ -196,6 +198,10 @@ class Project {
 			groups: this.serializeGroups(),
 			sprites: this.serializeSprites()	
 		};
+	}
+
+	exportProject(destination) {
+		fs.writeFile(destination, JSON.stringify(this.export()), err => {});
 	}
 
 	saveProject(destination=null, postSave=null) {

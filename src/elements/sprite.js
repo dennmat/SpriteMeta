@@ -169,14 +169,6 @@ Sprite.bindTo = function(sprite) {
 Sprite.delegate = function() {
 	var container = Sprite.optionsElement;
 
-	//container.on('keyup', '.sprite-options-width', e => {
-
-	//});
-
-	//container.on('keyup', '.sprite-options-height', e => {
-
-	//});
-
 	container.on('click', 'a.sprite-options-delete', e => {
 		e.preventDefault();
 
@@ -255,6 +247,8 @@ Sprite.updateOptions = function(sprite) {
 	element.find('input[name="sprite-options-height"]').val(sprite.rect.h);
 
 	Sprite.bindTo(sprite);
+
+	//Sprite.delegate();
 };
 
 Sprite.uidCounter = 0;
