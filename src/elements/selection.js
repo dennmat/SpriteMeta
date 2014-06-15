@@ -150,9 +150,9 @@ class Selection extends Focusable {
 	initGridMode() {
 		/*
 			Currently this function makes some assumptions:
-				h <= 50: Single Row, cells are w/5 wide
-				w <= 50: Single Column, cells are h/5 tall
-				Or h <= 50 && w <= 50, single cell
+				h <= 19: Single Row, cells are w/5 wide
+				w <= 19: Single Column, cells are h/5 tall
+				Or h <= 19 && w <= 19, single cell
 			Hopefully I can find a better way to init this.
 			Grid mode may also resize selection rect to fit perfect.
 		*/
@@ -162,19 +162,19 @@ class Selection extends Focusable {
 			numRows = 1,
 			cellHeight = 0;
 
-		if (this.rect.h <= 50 && this.rect.w <= 50) {
+		if (this.rect.h <= 19 && this.rect.w <= 19) {
 			numCols = 1;
 			numRows = 1;
-			cellHeight = 50;
-			cellWidth = 50;
-		} else if (this.rect.h <= 50) {
+			cellHeight = 19;
+			cellWidth = 19;
+		} else if (this.rect.h <= 19) {
 			numRows = 1;
-			cellHeight = 50;
+			cellHeight = 19;
 			cellWidth = Math.floor(this.rect.w/5);
 			numCols = Math.floor(this.rect.w/cellWidth);
-		} else if (this.rect.w <= 50) {
+		} else if (this.rect.w <= 19) {
 			numCols = 1;
-			cellWidth = 50;
+			cellWidth = 19;
 			cellHeight = Math.floor(this.rect.h/5);
 			numRows = Math.floor(this.rect.h/cellHeight);
 		} else {
@@ -184,8 +184,8 @@ class Selection extends Focusable {
 			numRows = Math.floor(this.rect.h/cellHeight);
 		}
 
-		this.rect.w = cellWidth * numCols;
-		this.rect.h = cellHeight * numRows;
+		//this.rect.w = cellWidth * numCols;
+		//this.rect.h = cellHeight * numRows;
 
 		var cell_count = numCols * numRows;
 		var on_row = 0,

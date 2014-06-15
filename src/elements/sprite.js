@@ -248,7 +248,7 @@ Sprite.updateOptions = function(sprite) {
 
 	Sprite.bindTo(sprite);
 
-	//Sprite.delegate();
+	Sprite.delegate();
 };
 
 Sprite.uidCounter = 0;
