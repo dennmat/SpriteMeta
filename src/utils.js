@@ -33,6 +33,15 @@ class Rect {
 		return {x:this.x, y:this.y, w:this.w, h:this.h};
 	}
 
+	fromDict(dict) {
+		this.x = dict.x;
+		this.y = dict.y;
+		this.w = dict.w;
+		this.h = dict.h;
+		this.updateDeltas();
+		return this;
+	}
+
 	hasIntersect(other_rect) {
 		this.updateDeltas();
 		return !!(

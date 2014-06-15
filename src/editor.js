@@ -104,7 +104,7 @@ class Editor {
 		var deltaX = (e.pageX - this.dragInfo.x);
 		var deltaY = (e.pageY - this.dragInfo.y);
 
-		var current_pos = this.image_element.position();
+		var current_pos = this.image_canvas.position();
 		
 		this.activeProject.setImagePosition(current_pos.left + deltaX, current_pos.top + deltaY);
 
@@ -426,7 +426,7 @@ class Editor {
 	setPos(deltaX, deltaY) {
 		var info = this.activeProject.editorInfo;
 
-		this.image_element.css({
+		this.image_canvas.css({
 			left: info.pos.x.toString() + 'px',
 			top: info.pos.y.toString() + 'px'
 		});
@@ -441,13 +441,12 @@ class Editor {
 	setZoom(previousZoom) {
 		var info = this.activeProject.editorInfo;
 
+		console.log("Setting Zoom", info.zoom);
+		console.log("D", this.activeProject.baseDimensions.w, this.activeProject.baseDimensions.h);
+
 		var newWidth = this.activeProject.baseDimensions.w * info.zoom;
 		var newHeight = this.activeProject.baseDimensions.h * info.zoom;
 
-		/*this.image_element.css({
-			width: newWidth.toString() + 'px',
-			height: newHeight.toString() + 'px'
-		});*/
 		this.image_canvas.attr('width', newWidth);
 		this.image_canvas.attr('height', newHeight);
 
@@ -487,6 +486,8 @@ class Editor {
 		this.setPos();
 		this.setZoom();
 
+		this.activeProject.update();
+
 		this.updateStatus();
 	}
 
@@ -508,27 +509,13 @@ class Editor {
 	}
 
 	resetImage() {
-		/*var newImg = $('<img>').one("load", e => {
-			this.loadedImage();
-		}).attr('src', this.activeProject.path);
-
-		this.image_element.remove();
-		this.image_element = null;
-
-		this.image_element = newImg;
-		this.image_element.appendTo(this.image_holder);*/
-
 		this.image_object = Image();
 		this.image_object.onload = () => {
 			this.image_canvas.attr('width', this.image_object.naturalWidth);
 			this.image_canvas.attr('height', this.image_object.naturalHeight);
 
 			this.loadedImage();
-
-			var ctx = this.image_canvas[0].getContext("2d");
-			ctx.imageSmoothingEnabled = false;
-			ctx.webkitImageSmoothingEnabled = false;
-			ctx.drawImage(this.image_object, 0, 0);
+			this.setZoom();
 		};
 		this.image_object.src = this.activeProject.path;
 
@@ -547,7 +534,10 @@ class Editor {
 		fs.readFile(path, (err, data) => {
 			var file_data = JSON.parse(data);
 
-			var proj = new Project(file_data, this, path);
+			var proj = new Project(null, this, path);
+			this.activeProject = proj;
+			proj.load(file_data);
+			this.reload();
 			this.projects.push(proj);
 
 			this.tab_manager.addEditorTab(this, proj, true);

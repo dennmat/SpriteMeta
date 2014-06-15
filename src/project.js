@@ -2,33 +2,51 @@ var fs = require('fs');
 var path = require('path');
 
 var Utils = require('./utils.js');
+var Elements = require('./elements');
 
 class Project {
 	constructor(info, editor, spriter_path=null) {
 		this.editor = editor;
 		this.id = Project.getUID();
 
-		var info_not_undefined = !!(info !== undefined && info !== null);
-
 		this.spriter_path = spriter_path;
+		this.name = "Untitled " + this.id.toString();
 
-		this.path = (info_not_undefined)? info.path : null;
-		this.size = (info_not_undefined)? info.size : null;
-		this.name = (info_not_undefined)? info.name : null;
-		
-		if (this.name == null) {
-			this.name = "Untitled " + this.id.toString();
-		}
+		this.size = null;
 
-		this.groups = (info_not_undefined)? info.groups : {};
-		this.sprites = (info_not_undefined)? info.sprites : [];
-		
-		this.baseDimensions = (info_not_undefined)? new Utils.Rect(0, 0, info.dimensions.width, info.dimensions.height) : new Utils.Rect();
+		this.group = {};
+		this.sprites = [];
+
+		this.baseDimensions = new Utils.Rect();
 
 		this.editorInfo = {
-			zoom: (info_not_undefined)? info.editorInfo.zoom : 1,
-			pos: (info_not_undefined)? new Utils.Rect(info.editorInfo.pos.x, info.editorInfo.pos.y, 0, 0) : new Utils.Rect()
+			zoom: 1,
+			pos: new Utils.Rect()
 		};
+
+		if (info !== undefined && info !== null) {
+			this.load(info);
+		}
+	}
+
+	load(data) {
+		this.path = data.path;
+		this.size = data.size;
+		this.name = data.name;
+
+		this.baseDimensions = new Utils.Rect(0, 0, data.dimensions.width, data.dimensions.height);
+
+		this.editorInfo = {
+			zoom: data.editorInfo.zoom,
+			pos: new Utils.Rect(data.editorInfo.pos.x, data.editorInfo.pos.y, 0, 0)
+		};
+
+		if (data.sprites) {
+			for (var sprite of data.sprites) {
+				var spriteObj = new Elements.Sprite(this.editor, {rect: new Utils.Rect().fromDict(sprite.rect)});
+				this.addSprite(spriteObj, false);
+			}
+		}
 	}
 
 	setImagePosition(x, y) {
@@ -85,7 +103,7 @@ class Project {
 		this.markDirty(true);
 	}
 
-	addSprite(sprite) {
+	addSprite(sprite, makeDirty) {
 		//Check for collisions
 		//for (var sprite of this.sprites) {
 		//	if (sprite.rect.hasIntersect(rect)) {
@@ -94,7 +112,9 @@ class Project {
 		//}
 		this.sprites.push(sprite);
 
-		this.markDirty(true);
+		if (makeDirty === undefined || makeDirty === true) {
+			this.markDirty(true);
+		}
 	}
 
 	getSpriteByUID(uid) {
@@ -120,7 +140,16 @@ class Project {
 	}
 
 	serializeSprites() {
-		return []; // [{region: sprite.region.toDict()} for (sprite of this.sprites)];
+		//return []; // [{region: sprite.region.toDict()} for (sprite of this.sprites)];
+		var sprites = [];
+
+		for (var sprite of this.sprites) {
+			sprites.push({
+				rect: sprite.rect.toDict()
+			});
+		}
+
+		return sprites;
 	}
 
 	serializeEditorInfo() {
