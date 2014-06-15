@@ -184,9 +184,6 @@ class Selection extends Focusable {
 			numRows = Math.floor(this.rect.h/cellHeight);
 		}
 
-		//this.rect.w = cellWidth * numCols;
-		//this.rect.h = cellHeight * numRows;
-
 		var cell_count = numCols * numRows;
 		var on_row = 0,
 			on_col = 0;
