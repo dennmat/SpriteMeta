@@ -29,6 +29,10 @@ class Editor {
 		this.selectionRegion = null;
 		this.selection = null;
 
+		//For multiple selection of sprites:
+		this.selected = [];
+		this.multiSelecting = false;
+
 		this.mousePos = new Utils.Rect();
 
 		this.tools = new Tools();
@@ -154,15 +158,40 @@ class Editor {
 		this.tools.enableSelectionTools();
 	}
 
-	focus(element) {
+	focus(element, isMulti=false) {
 		if (this.focusedElement !== null) {
 			this.focusedElement.blur()
 		}
 
-		this.focusedElement = element;
-		this.focusedElement.receiveFocus();
+		if (isMulti) {
+			if (this.focusedElement !== null && this.focusedElement != element) {
+				this.selected.push(this.focusedElement);
+				this.focusedElement.element.addClass('focused');
+				this.focusedElement = null;
+			}
 
-		this.setOptions();
+			this.multiSelecting = true;
+			
+			this.selected.push(element);
+
+			element.element.addClass('focused');
+			
+			this.clearOptions();
+		} else {
+			if (this.multiSelecting) {
+				this.multiSelecting = false;
+
+				for (var s of this.selected) {
+					s.blur();
+				}
+
+				this.selected.length = 0;
+			}
+
+			this.focusedElement = element;
+			this.focusedElement.receiveFocus();
+			this.setOptions();
+		}
 	}
 
 	clearFocus() {
@@ -412,7 +441,7 @@ class Editor {
 
 			var sprite = this.activeProject.getSpriteByUID(spriteBox.data('uid'));
 
-			this.focus(sprite);
+			this.focus(sprite, e.ctrlKey);
 		});
 	}
 

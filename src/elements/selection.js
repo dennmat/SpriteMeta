@@ -207,7 +207,7 @@ class Selection extends Focusable {
 		this.gridSize.w = cellWidth;
 		this.gridSize.h = cellHeight;
 
-	Selection.optionsElement.find('input[name="selection-grid-width"]').val(this.gridSize.w);
+		Selection.optionsElement.find('input[name="selection-grid-width"]').val(this.gridSize.w);
 		Selection.optionsElement.find('input[name="selection-grid-height"]').val(this.gridSize.h);
 		Selection.optionsElement.find('input[name="selection-grid-spacing"]').val(this.spacing);
 	}
