@@ -1,6 +1,8 @@
 global.$ = $;
 var $traceurRuntime = global.$traceurRuntime;
 
+var fs = require('fs');
+
 var ngui = require('nw.gui');
 
 var Editor = require('../c/editor.js');
@@ -12,7 +14,25 @@ class Main {
 		this.win.showDevTools();
 
 		this.tab_manager = null;
+		this.config = {};
 
+		this.loadConfig();
+	}
+
+	loadConfig() {
+		fs.exists('sconfig.json', exists => {
+			if (exists) {
+				fs.readFile('sconfig.json', (err, data) => {
+					this.config = JSON.parse(data);
+					this.configLoaded();
+				});
+			} else {
+				this.configLoaded();
+			}
+		});
+	}
+
+	configLoaded() {
 		this.setUp();
 	}
 

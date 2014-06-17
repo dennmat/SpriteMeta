@@ -1,3 +1,5 @@
 c/*
 node_modules/*
 test/*
+*.xcf
+sconfig.json
