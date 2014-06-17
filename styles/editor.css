@@ -178,6 +178,12 @@
 
 .mover td {
 	width: 30%;
+	vertical-align: middle;
+	height: 50px;
+}
+
+#editor .tool-options .mover td a {
+	display: inline;
 }
 
 #editor .tool-options .mover input.mover-amount {
