@@ -5,16 +5,16 @@ spritzup (Probably not the final name)
 
 A tool mainly for sectioning regions of a spritesheet into groups and individual sprites and exporting to a useable format.
 
-Also there was a recent name change screenshots/code has yet to catch up!
+Also there was a recent name change; screenshots/code has yet to catch up!
 
 Technologies Used
 ------------------
-1. [Node-Webkit](https://github.com/rogerwang/node-webkit). If you haven't checked it out yet you should. It makes desktop development bearable by combining nodejs and an embedded webkit allowing you to use html and css.
-2. [Traceur](https://github.com/google/traceur-compiler). Yay ecma6
+1. [Node-Webkit](https://github.com/rogerwang/node-webkit). If you haven't checked it out yet, you should. It makes desktop development bearable by combining node.js and an embedded webkit allowing you to use HTML and CSS.
+2. [Traceur](https://github.com/google/traceur-compiler). Yay ECMA6
 3. (Sort of relevant here) Bootstrap, started with the Cover theme from their examples page.
 
 ### Apologies
-Currently the mix of _ and camels is a little hectic I'll get to cleaning up once I have this thing actually doing some useful stuff.
+Currently the mix of _ and camels is a little hectic, I'll get to cleaning up once I have this thing actually doing some useful stuff.
 
 Dependencies
 ------------
@@ -34,7 +34,7 @@ How To Build
 ------------
 #### Windows/Linux
 
-Make sure nodewebkit is on your path
+Make sure nodewebkit is on your path.
 
 Get the dependencies.
 
