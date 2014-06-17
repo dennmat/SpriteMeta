@@ -1,5 +1,7 @@
 var fs = require('fs');
 
+var Mustache = require('Mustache');
+
 var Utils = require('./utils.js');
 var Project = require('./project.js');
 var Elements = require('./elements');
@@ -176,7 +178,11 @@ class Editor {
 
 			element.element.addClass('focused');
 			
-			this.clearOptions();
+			if (this.selected.length <= 2) {
+				this.setOptions();
+			} else {
+				Editor.updateMultiSelectOptions(this);
+			}
 		} else {
 			if (this.multiSelecting) {
 				this.multiSelecting = false;
@@ -210,13 +216,17 @@ class Editor {
 	}
 
 	setOptions() {
-		if (this.focusedElement === null) {
-			this.element.find('.tool-options').empty();
+		this.element.find('.tool-options').empty();
+		
+		if (this.focusedElement === null && !this.multiSelecting) {
 			return;
 		}
 
-		this.element.find('.tool-options').empty();
-		this.element.find('.tool-options').append(this.focusedElement.renderOptions());
+		if (this.multiSelecting) {
+			this.element.find('.tool-options').append(Editor.getMultiSelectElement(this));
+		} else {
+			this.element.find('.tool-options').append(this.focusedElement.renderOptions());
+		}
 	}
 
 	delegate() {
@@ -621,5 +631,68 @@ class Editor {
 
 	}
 }
+
+Editor.MultiSelectElement = null;
+
+Editor.getMultiSelectElement = function(editor) {
+	if (Editor.MultiSelectElement === null) {
+		Editor.MultiSelectElement = $(Mustache.to_html(Editor.MultiSelectOptionsTemplate, {}));
+	}
+
+	Editor.updateMultiSelectOptions(editor);
+
+	return Editor.MultiSelectElement;
+};
+
+Editor.updateMultiSelectOptions = function(editor) {
+	var element = Editor.MultiSelectElement;
+
+	element.find('.selected-sprites-count').text(editor.selected.length);
+
+	var ul = element.find('.currently-selected-sprites');
+	ul.empty();
+
+	for (var sprite of editor.selected) {
+		ul.append(
+			$('<li><\/li>', {text: sprite.name})
+		);
+	}
+};
+
+Editor.MultiSelectOptionsTemplate = `
+<div class="selected-sprites-container">
+	Selecting <span class="selected-sprites-count"></span> sprites. 
+	<ul class="currently-selected-sprites">
+	</ul>
+	<table class="mover">
+		<tr>
+			<td colspan="3">
+				<div class="title">
+				Multi Selection Controller
+				</div>
+				<select class="mover-type">
+					<option value="position" selected="selected">Position</option>
+					<option value="size">Size</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="#" class="button blue mover-up"><i class="icon-chevron-up"></i></a></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><a href="#" class="button blue mover-left"><i class="icon-chevron-left"></i></a></td>
+			<td><input type="text" class="mover-amount" value="1" />px</td>
+			<td><a href="#" class="button blue mover-right"><i class="icon-chevron-right"></i></a></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="#" class="button blue mover-down"><i class="icon-chevron-down"></i></a></td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+</div>
+`;
 
 module.exports = Editor;

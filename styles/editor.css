@@ -153,3 +153,39 @@
 	height: 1px;
 	box-sizing: border-box;
 }
+
+#editor .selected-sprites-container .currently-selected-sprites {
+	list-style-type: none;
+	padding: 0;
+}
+
+#editor .selected-sprites-container .currently-selected-sprites li {
+	padding: 5px 15px;
+	background: #999999;
+	margin: 2px 0;
+}
+
+.mover {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.mover .title {
+	font-weight: bold;
+	text-align: center;
+	display: block;
+}
+
+.mover td {
+	width: 30%;
+}
+
+#editor .tool-options .mover input.mover-amount {
+	width: 36px;
+	display: inline;
+	margin-right: 5px;
+}
+
+#editor .tool-options select {
+	color: #000;
+}
