@@ -50,13 +50,14 @@ Current Status
 Working on:
 
 * Implementing the group/sprite selection tools/functionality.
-* Implementing a method of scaling the selections with the editor.
-* Grid selection, will build a grid of specified dimensions and create sprites out of the cells.
-* Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.
-* Proper saving/export.
+-* Implementing a method of scaling the selections with the editor.-
+-* Grid selection, will build a grid of specified dimensions and create sprites out of the cells.-
+-* Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.-
+-* Proper saving/export.-
 
 
 Screenshots
 -----------
 ![First Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/main-5-19-2014.png "Main Screen")
 ![Editor Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-6-15-2014.png "Editor Screen")
+![Editor Screen Multi](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-multiselect-6-16-2014.png "Editor Screen Multi Select")
