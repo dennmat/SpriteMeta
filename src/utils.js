@@ -107,6 +107,13 @@ class Rect {
 	}
 }
 
+var Orient = {
+	"UP": 0,
+	"RIGHT": 1,
+	"DOWN": 2,
+	"LEFT": 3
+};
+
 var KeyCodes = {
 	"UP": 38,
 	"DOWN": 40,
@@ -118,5 +125,6 @@ module.exports = {
 	"openDialog": openDialog,
 	"saveDialog": saveDialog,
 	"Rect": Rect,
-	"KeyCodes": KeyCodes
+	"KeyCodes": KeyCodes,
+	"Orient": Orient
 };

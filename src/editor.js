@@ -639,6 +639,61 @@ Editor.getMultiSelectElement = function(editor) {
 		Editor.MultiSelectElement = $(Mustache.to_html(Editor.MultiSelectOptionsTemplate, {}));
 	}
 
+	var element = Editor.MultiSelectElement;
+
+	element.on('click', '.mover-up', e => {
+		var type = element.find('.mover-type').val();
+		var delta = parseInt(element.find('.mover-amount').val()) * -1;
+
+		for (var sprite of editor.selected) {
+			if (type == 'position') {
+				sprite.alterPosition(delta, Utils.KeyCodes.UP);
+			} else {
+				sprite.alterSize(delta, Utils.KeyCodes.UP);
+			}
+		}
+	});
+
+	element.on('click', '.mover-down', e => {
+		var type = element.find('.mover-type').val();
+		var delta = parseInt(element.find('.mover-amount').val());
+
+		for (var sprite of editor.selected) {
+			if (type == 'position') {
+				sprite.alterPosition(delta, Utils.KeyCodes.DOWN);
+			} else {
+				sprite.alterSize(delta, Utils.KeyCodes.DOWN);
+			}
+		}
+	});
+
+	element.on('click', '.mover-left', e => {
+		var type = element.find('.mover-type').val();
+		var delta = parseInt(element.find('.mover-amount').val()) * -1;
+
+		for (var sprite of editor.selected) {
+			if (type == 'position') {
+				sprite.alterPosition(delta, Utils.KeyCodes.LEFT);
+			} else {
+				sprite.alterSize(delta, Utils.KeyCodes.LEFT);
+			}
+		}
+	});
+
+	element.on('click', '.mover-right', e => {
+		var type = element.find('.mover-type').val();
+		var delta = parseInt(element.find('.mover-amount').val());
+
+		for (var sprite of editor.selected) {
+			if (type == 'position') {
+				sprite.alterPosition(delta, Utils.KeyCodes.RIGHT);
+			} else {
+				sprite.alterSize(delta, Utils.KeyCodes.RIGHT);
+			}
+		}
+	});
+
+
 	Editor.updateMultiSelectOptions(editor);
 
 	return Editor.MultiSelectElement;

@@ -74,6 +74,26 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		return Sprite.getOptionsElement();
 	}
 
+	alterPosition(delta, orient) {
+		if (orient === Utils.KeyCodes.UP || orient == Utils.KeyCodes.DOWN) {
+			this.rect.y += delta;
+		} else {
+			this.rect.x += delta;
+		}
+
+		this.reposition();
+	}
+
+	alterSize(delta, orient) {
+		if (orient === Utils.KeyCodes.UP || orient == Utils.KeyCodes.DOWN) {
+			this.rect.h += delta;
+		} else {
+			this.rect.w += delta;
+		}
+
+		this.reposition();
+	}
+
 	keyUpEvent(e) {
 		var dirty = false;
 
