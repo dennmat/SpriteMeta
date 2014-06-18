@@ -31,7 +31,7 @@ class Editor {
 		this.selectionRegion = null;
 		this.selection = null;
 
-		//For multiple selection of sprites:
+		//For selecting multiple sprites:
 		this.selected = [];
 		this.multiSelecting = false;
 
@@ -85,7 +85,7 @@ class Editor {
 		this.element.show();
 	}
 
-	//Return generic area for elements to exist
+	//Return generic area for elements to exist in
 	getEditorContainer() {
 		return this.element.find('.right-pane');
 	}
@@ -503,7 +503,7 @@ class Editor {
 			ctx.drawImage(this.image_object, 0, 0, newWidth, newHeight);
 		}
 
-		if (this.selection !== null) { //Temporary
+		if (this.selection !== null) { //FIXME: short term fix
 			this.selection.reposition();
 		}
 
