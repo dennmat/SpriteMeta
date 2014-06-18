@@ -211,6 +211,21 @@ class Editor {
 		this.setOptions();
 	}
 
+	clearSelections() {
+		if (!this.multiSelecting) {
+			return;
+		}
+
+		for (var s of this.selected) {
+			s.blur();
+		}
+
+		this.selected.length = 0;
+		this.multiSelecting = false;
+
+		this.setOptions();
+	}
+
 	clearOptions() {
 		this.element.find('.tool-options').empty();
 	}
@@ -284,6 +299,16 @@ class Editor {
 
 		this.element.on('mousedown', '.image-holder', e => {
 			e.preventDefault();
+
+			if (this.focusedElement) {
+				this.clearFocus();
+				return false;
+			}
+
+			if (this.multiSelecting) {
+				this.clearSelections();
+				return false;
+			}
 			
 			if (e.shiftKey) {
 
