@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var Mustache = require('Mustache');
+var Mustache = require('mustache');
 
 var Utils = require('./utils.js');
 var Project = require('./project.js');
