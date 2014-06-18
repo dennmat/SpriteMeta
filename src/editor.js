@@ -140,7 +140,7 @@ class Editor {
 		adjustedPos.w = adjustedRegion.w;
 		adjustedPos.h = adjustedRegion.h;
 
-		var w = (e.pageX - relative.left) - adjustedPos.x;
+		var w = ((e.pageX - relative.left) + container.get(0).scrollLeft) - adjustedPos.x;
 		var h = ((e.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
 
 		w /= info.zoom;
@@ -211,7 +211,18 @@ class Editor {
 		this.setOptions();
 	}
 
-	clearSelections() {
+	clearSelection() {
+		if (this.selection === null) {
+			return;
+		}
+
+		this.clearFocus();
+		this.selection.destroy();
+		this.selection = null;
+		this.selectionRegion = null;
+	}
+
+	clearSelected() {
 		if (!this.multiSelecting) {
 			return;
 		}
@@ -300,13 +311,18 @@ class Editor {
 		this.element.on('mousedown', '.image-holder', e => {
 			e.preventDefault();
 
-			if (this.focusedElement) {
-				this.clearFocus();
+			if (this.multiSelecting) {
+				this.clearSelected();
 				return false;
 			}
 
-			if (this.multiSelecting) {
-				this.clearSelections();
+			if (this.selection) {
+				this.clearSelection();
+				return false;
+			}
+
+			if (this.focusedElement) {
+				this.clearFocus();
 				return false;
 			}
 			
@@ -342,7 +358,7 @@ class Editor {
 						adjustedPos.w = adjustedRegion.w;
 						adjustedPos.h = adjustedRegion.h;
 
-						var w = (we.pageX - relative.left) - adjustedPos.x;
+						var w = ((we.pageX - relative.left) + container.get(0).scrollLeft) - adjustedPos.x;
 						var h = ((we.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
 						
 						w /= info.zoom;
@@ -363,7 +379,7 @@ class Editor {
 						var info = this.activeProject.editorInfo;
 						this.selecting = true;
 
-						var x = parseInt((e.pageX - relative.left) / info.zoom) * info.zoom;
+						var x = parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom;
 						var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
 						
 						var region = new Utils.Rect(x, y);
@@ -455,7 +471,7 @@ class Editor {
 			var info = this.activeProject.editorInfo;
 			
 			var pointer = this.container.find('.pointer');
-			var x = parseInt((e.pageX - relative.left) / info.zoom) * info.zoom;
+			var x = parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom;
 			var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
 
 			this.mousePos.x = parseInt(x/info.zoom);
