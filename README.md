@@ -20,14 +20,31 @@ Dependencies
 ------------
 Run these from the root directory so you end up with your `node_modules` folder there.
 
+*Instead of the below setups* I recommend just running `npm install` from the root dir
+
+Gulp - Build System
+```bash
+npm install gulp
+```
+
 Mustache - Template engine
 ```bash
 npm install mustache
 ```
 
-traceur - ECMA 6 to ECMA 5 compiler
+Traceur - ECMA 6 to ECMA 5 compiler
 ```bash
 npm install traceur
+```
+
+Gulp-Sass - Build Sass
+```bash
+npm install gulp-sass
+```
+
+Gulp-Traceur - Build Traceur
+```bash
+npm install gulp-traceur
 ```
 
 How To Build
@@ -38,11 +55,10 @@ Make sure nodewebkit is on your path.
 
 Get the dependencies.
 
-Then from the root dir where build.py is run:
+Then from the root dir run:
 ```bash
-python build.py
+gulp
 ```
-
 
 Current Status
 --------------

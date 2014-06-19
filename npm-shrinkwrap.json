@@ -1,0 +1,71 @@
+{
+  "name": "Spritzup",
+  "dependencies": {
+    "mustache": {
+      "version": "0.8.2",
+      "from": "mustache@",
+      "resolved": "https://registry.npmjs.org/mustache/-/mustache-0.8.2.tgz"
+    },
+    "traceur": {
+      "version": "0.0.45",
+      "from": "traceur@",
+      "resolved": "https://registry.npmjs.org/traceur/-/traceur-0.0.45.tgz",
+      "dependencies": {
+        "commander": {
+          "version": "2.2.0",
+          "from": "commander@>=1.1",
+          "resolved": "https://registry.npmjs.org/commander/-/commander-2.2.0.tgz"
+        },
+        "q-io": {
+          "version": "1.10.9",
+          "from": "q-io@~1.10.6",
+          "resolved": "https://registry.npmjs.org/q-io/-/q-io-1.10.9.tgz",
+          "dependencies": {
+            "q": {
+              "version": "0.9.7",
+              "from": "q@~0.9.7",
+              "resolved": "https://registry.npmjs.org/q/-/q-0.9.7.tgz"
+            },
+            "qs": {
+              "version": "0.1.0",
+              "from": "qs@~0.1.0",
+              "resolved": "https://registry.npmjs.org/qs/-/qs-0.1.0.tgz"
+            },
+            "url2": {
+              "version": "0.0.0",
+              "from": "url2@~0.0.0",
+              "resolved": "https://registry.npmjs.org/url2/-/url2-0.0.0.tgz"
+            },
+            "mime": {
+              "version": "1.2.11",
+              "from": "mime@~1.2.11",
+              "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
+            },
+            "mimeparse": {
+              "version": "0.1.4",
+              "from": "mimeparse@~0.1.4",
+              "resolved": "https://registry.npmjs.org/mimeparse/-/mimeparse-0.1.4.tgz"
+            },
+            "collections": {
+              "version": "0.2.2",
+              "from": "collections@~0.2.0",
+              "resolved": "https://registry.npmjs.org/collections/-/collections-0.2.2.tgz",
+              "dependencies": {
+                "weak-map": {
+                  "version": "1.0.0",
+                  "from": "weak-map@1.0.0",
+                  "resolved": "https://registry.npmjs.org/weak-map/-/weak-map-1.0.0.tgz"
+                }
+              }
+            }
+          }
+        },
+        "semver": {
+          "version": "2.3.1",
+          "from": "semver@*",
+          "resolved": "https://registry.npmjs.org/semver/-/semver-2.3.1.tgz"
+        }
+      }
+    }
+  }
+}

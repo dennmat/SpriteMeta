@@ -7,7 +7,6 @@ var Project = require('./project.js');
 var Elements = require('./elements');
 var Tools = require('./tools.js');
 
-//WTF
 function Image() {
 	return window.document.createElement("img");
 }
