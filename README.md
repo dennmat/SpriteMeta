@@ -1,7 +1,7 @@
 spritzup (Probably not the final name)
 ========
 
-*v0.0a Not very useful right now. 0.1a will have basic functionality.*
+*0.1a - First version increase! Has super basic functionality*
 
 A tool mainly for sectioning regions of a spritesheet into groups and individual sprites and exporting to a useable format.
 
@@ -63,14 +63,7 @@ gulp
 Current Status
 --------------
 
-Working on:
-
-* Implementing the group/sprite selection tools/functionality.
--* Implementing a method of scaling the selections with the editor.-
--* Grid selection, will build a grid of specified dimensions and create sprites out of the cells.-
--* Auto size group. Sizing one cell, will create equivalent cells throughout the group automatically.-
--* Proper saving/export.-
-
+Getting the basic functions of the application implemented. Then onto code cleanup. Then onto "cool" feature development. Then onto bug fixes and feature creeps.
 
 Screenshots
 -----------
