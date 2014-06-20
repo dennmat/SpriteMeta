@@ -16,8 +16,8 @@ function Image() {
 }
 
 class Editor {
-	constructor(container, tab_manager) {
-		this.tab_manager = tab_manager;
+	constructor(container, tabManager) {
+		this.tabManager = tabManager;
 
 		this.projects = [];
 		this.activeProject = null;
@@ -590,7 +590,7 @@ class Editor {
 		var proj = new Project(undefined, this);
 		this.projects.push(proj);
 
-		this.tab_manager.addEditorTab(this, proj, true);
+		this.tabManager.addEditorTab(this, proj, true);
 	}
 
 	openFile(path) {
@@ -603,7 +603,7 @@ class Editor {
 			this.reload();
 			this.projects.push(proj);
 
-			this.tab_manager.addEditorTab(this, proj, true);
+			this.tabManager.addEditorTab(this, proj, true);
 		});
 	}
 
@@ -639,14 +639,14 @@ class Editor {
 		var proj = this.getProjectById(project_id);
 
 		if (proj.dirty) {
-			this.tab_manager.markTabDirty(project_id);
+			this.tabManager.markTabDirty(project_id);
 		} else {
-			this.tab_manager.markTabClean(project_id);
+			this.tabManager.markTabClean(project_id);
 		}
 	}
 
 	postSave() {
-		this.tab_manager.updateTabName(this.activeProject.id, this.activeProject.name);
+		this.tabManager.updateTabName(this.activeProject.id, this.activeProject.name);
 	}
 
 	exportFile() {
