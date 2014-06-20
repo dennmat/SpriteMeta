@@ -12,6 +12,7 @@ class Selection extends Focusable {
 		this.editor = editor;
 
 		this.rect = (rect !== undefined)? rect : new Utils.Rect();
+		this.originalRect = (rect !== undefined)? rect.copy() : new Utils.Rect();;
 
 		this.element = null;
 
@@ -83,15 +84,13 @@ class Selection extends Focusable {
 		this.repositionSubSelects();
 	}
 
-	setDimensions(w, h) {
-		var tempRect = new Utils.Rect(this.rect.x, this.rect.y, w, h);
-		
-		//Gotta preserve x,y in this case. because it's essentially treated as a new position that isn't shifting an existing value
-		var oldx = tempRect.x;
-		var oldy = tempRect.y;
-		//tempRect.removeZoom(this.editor.zoom);
-		tempRect.x = oldx;
-		tempRect.y = oldy;
+	setDimensions(x, y) {
+		var tempRect = new Utils.Rect(
+			parseInt(Math.min(this.originalRect.x, x)),
+			parseInt(Math.min(this.originalRect.y, y)), 
+			parseInt(Math.abs(this.originalRect.x - x)),
+			parseInt(Math.abs(this.originalRect.y - y))
+		);
 
 		this.rect = tempRect;
 

@@ -194,10 +194,13 @@ $black: #000;
 		li {
 			margin: 0;
 			display: inline-block;
-			width: 100px;
+			width: 49%;
 			background: $darkAccent;
 			color: $offWhite;
 			padding: 10px 15px;
+
+			box-sizing: border-box;
+			border: 0;
 			
 			&.selected {
 				background: #555;

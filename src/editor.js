@@ -120,7 +120,6 @@ class Editor {
 
 	handleSelection(e) {
 		var wasSelecting = this.selecting;
-		var info = this.activeProject.editorInfo;
 		this.selecting = false;
 
 		$(window).unbind("mousemove");
@@ -131,24 +130,16 @@ class Editor {
 
 		var container = this.getEditorContainer();
 		var relative = container.offset();
+		var info = this.activeProject.editorInfo;
 
-		var adjustedRegion = this.selectionRegion.copy();
-		adjustedRegion.adjustToZoom(this.zoom);
+		var newXY = this.activeProject.relativePosToImagePos(
+			parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom, 
+			parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom
+		);
 
-		var adjustedPos = this.activeProject.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
-		adjustedPos.w = adjustedRegion.w;
-		adjustedPos.h = adjustedRegion.h;
+		newXY.removeZoom(this.zoom);
 
-		var w = ((e.pageX - relative.left) + container.get(0).scrollLeft) - adjustedPos.x;
-		var h = ((e.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
-
-		w /= info.zoom;
-		h /= info.zoom;
-
-		w = Math.floor(w) + 1;
-		h = Math.floor(h) + 1;
-
-		this.selection.setDimensions(w, h);
+		this.selection.setDimensions(newXY.x, newXY.y);
 
 		this.selectionRegion = null;
 		this.selectionMade();
@@ -350,30 +341,15 @@ class Editor {
 					
 					if (this.selecting) {
 						var info = this.activeProject.editorInfo;
-						var adjustedRegion = this.selectionRegion.copy();
-						adjustedRegion.adjustToZoom(this.zoom);
 
-						var adjustedPos = this.activeProject.imagePosToRelativePos(adjustedRegion.x, adjustedRegion.y);
-						adjustedPos.w = adjustedRegion.w;
-						adjustedPos.h = adjustedRegion.h;
+						var newXY = this.activeProject.relativePosToImagePos(
+								parseInt(((we.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom, 
+								parseInt(((we.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom
+						);
 
-						var w = ((we.pageX - relative.left) + container.get(0).scrollLeft) - adjustedPos.x;
-						var h = ((we.pageY - relative.top) + container.get(0).scrollTop) - adjustedPos.y;
-						
-						w /= info.zoom;
-						h /= info.zoom;
+						newXY.removeZoom(this.zoom);
 
-						w = Math.floor(w) + 1;
-						h = Math.floor(h) + 1;
-
-						if (w > this.activeProject.baseDimensions.w) {
-							w = this.activeProject.baseDimensions.w;
-						}
-						if (h > this.activeProject.baseDimensions.h) {
-							h = this.activeProject.baseDimensions.h;
-						}
-						
-						this.selection.setDimensions(w, h);
+						this.selection.setDimensions(newXY.x, newXY.y);
 					} else {
 						var info = this.activeProject.editorInfo;
 						this.selecting = true;
