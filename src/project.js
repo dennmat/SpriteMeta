@@ -20,7 +20,7 @@ class Project {
 		this.sprites = [];
 
 		this.baseDimensions = new Utils.Rect();
-
+		
 		this.editorInfo = {
 			zoom: 1,
 			pos: new Utils.Rect()
@@ -32,6 +32,7 @@ class Project {
 	}
 
 	load(data) {
+		//Take a json representing a .sprtr project and load it into this project
 		this.path = data.path;
 		this.size = data.size;
 		this.name = data.name;
@@ -64,6 +65,9 @@ class Project {
 	}
 
 	relativePosToImagePos(x, y) {
+		//Convert mouse/window level coordinates to 
+		//coordinates relative to the image
+
 		var relative = this.getImagePosition();
 		
 		var rect = new Utils.Rect(x - relative.x, y - relative.y);
@@ -75,6 +79,7 @@ class Project {
 	}
 
 	imagePosToRelativePos(x, y) {
+		//Convert image positions to window/editor coordinates
 		var relative = this.getImagePosition();
 
 		return new Utils.Rect(x + relative.x, y + relative.y);
@@ -86,6 +91,7 @@ class Project {
 	}
 
 	setDimensions(rect) {
+		//The images size
 		this.baseDimensions = rect;
 	}
 
@@ -109,12 +115,6 @@ class Project {
 	}
 
 	addSprite(sprite, makeDirty) {
-		//Check for collisions
-		//for (var sprite of this.sprites) {
-		//	if (sprite.rect.hasIntersect(rect)) {
-		//		return false;
-		//	}
-		//}
 		this.sprites.push(sprite);
 
 		if (makeDirty === undefined || makeDirty === true) {

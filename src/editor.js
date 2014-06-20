@@ -3,9 +3,13 @@ var fs = require('fs');
 var Mustache = require('mustache');
 
 var Utils = require('./utils.js');
+
 var Project = require('./project.js');
+
 var Elements = require('./elements');
 var Tools = require('./tools.js');
+
+var StatusBarController = require('./statusbar.js');
 
 function Image() {
 	return window.document.createElement("img");
@@ -44,6 +48,8 @@ class Editor {
 
 		this.element = null;
 		this.build();
+
+		this.statusBar = new StatusBarController(this);
 	}
 
 	build() {
@@ -64,19 +70,11 @@ class Editor {
 			this.element.hide();
 			this.container.append(this.element);
 
-			this.updateStatus();
+			this.statusBar.editorLoaded();
+			this.statusBar.updateStatus();
 
 			this.delegate();
 		});
-	}
-
-	updateStatus() {
-		var zoom_value = this.element.find('.status-bar .zoom-frame .frame-value');
-		var mouse_value = this.element.find('.status-bar .mouse-frame .frame-value');
-
-		//right_side.text('Zoom: ' + parseInt(this.zoom*100).toString() + '%' + ' Mouse: (' + this.mousePos.x + ', ' + this.mousePos.y + ')');
-		zoom_value.text(parseInt(this.zoom*100));
-		mouse_value.text('(' + this.mousePos.x + ', ' + this.mousePos.y + ')');
 	}
 
 	hide() {
@@ -423,7 +421,7 @@ class Editor {
 				this.setZoom();
 				
 				clearInterval(this.scrollInterval);
-				this.updateStatus();
+				this.statusBar.updateStatus();
 			}, 50);
 
 			return false;
@@ -460,7 +458,7 @@ class Editor {
 				top: y
 			});
 
-			this.updateStatus();
+			this.statusBar.updateStatus();
 		});
 
 		this.element.on('click', '.sprite-box', e => {
@@ -471,39 +469,6 @@ class Editor {
 			var sprite = this.activeProject.getSpriteByUID(spriteBox.data('uid'));
 
 			this.focus(sprite, e.ctrlKey);
-		});
-
-		this.zoomSelectOpen = false;
-		$('.zoom-frame').on('mouseenter', e => {
-			$('.zoom-frame .zoom-control').show();
-			$('.zoom-frame .frame-value').hide();
-		});
-
-		$('.zoom-frame').on('click', '.zoom-control', e => {
-			this.zoomSelectOpen = true;
-		});
-
-		$('.zoom-frame').on('change', '.zoom-control', e => {
-			$('.zoom-frame .zoom-control').hide();
-			$('.zoom-frame .frame-value').show();
-			this.zoomSelectOpen = false;
-			
-			var newZoom = (parseFloat($(e.target).val())/100.0).toFixed(2);
-
-			this.setZoom(newZoom);
-		});
-
-		$('.zoom-frame').on('blur', '.zoom-control', e => {
-			$('.zoom-frame .zoom-control').hide();
-			$('.zoom-frame .frame-value').show();
-			this.zoomSelectOpen = false;
-		});
-
-		$('.zoom-frame').on('mouseleave', e => {
-			if (!this.zoomSelectOpen) {
-				$('.zoom-frame .zoom-control').hide();
-				$('.zoom-frame .frame-value').show();
-			}
 		});
 	}
 
@@ -586,7 +551,7 @@ class Editor {
 
 		this.activeProject.update();
 
-		this.updateStatus();
+		this.statusBar.updateStatus();
 	}
 
 	getProjectById(id) {
