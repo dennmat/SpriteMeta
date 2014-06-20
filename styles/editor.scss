@@ -98,14 +98,24 @@ $black: #000;
 	}
 
 	.status-bar {
-		table {
-			width: 100%;
-			margin: 0;
-			padding: 0;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		
+		.zoom-frame,
+		.mouse-frame {
+			width: 150px;
 		}
-		.left-side {
+
+		.zoom-frame {
+			.zoom-control {
+				display: none;
+				color: $dark;
+			}
 		}
-		.right-side {
+
+		.frame-value {
+			color: #DDD;
 		}
 	}
 

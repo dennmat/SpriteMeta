@@ -71,9 +71,12 @@ class Editor {
 	}
 
 	updateStatus() {
-		var right_side = this.element.find('.status-bar .right-side');
+		var zoom_value = this.element.find('.status-bar .zoom-frame .frame-value');
+		var mouse_value = this.element.find('.status-bar .mouse-frame .frame-value');
 
-		right_side.text('Zoom: ' + parseInt(this.zoom*100).toString() + '%' + ' Mouse: (' + this.mousePos.x + ', ' + this.mousePos.y + ')');
+		//right_side.text('Zoom: ' + parseInt(this.zoom*100).toString() + '%' + ' Mouse: (' + this.mousePos.x + ', ' + this.mousePos.y + ')');
+		zoom_value.text(parseInt(this.zoom*100));
+		mouse_value.text('(' + this.mousePos.x + ', ' + this.mousePos.y + ')');
 	}
 
 	hide() {
@@ -417,7 +420,7 @@ class Editor {
 
 				this.activeProject.editorInfo.zoom = this.zoom;
 
-				this.setZoom(currentZoom);
+				this.setZoom();
 				
 				clearInterval(this.scrollInterval);
 				this.updateStatus();
@@ -469,6 +472,39 @@ class Editor {
 
 			this.focus(sprite, e.ctrlKey);
 		});
+
+		this.zoomSelectOpen = false;
+		$('.zoom-frame').on('mouseenter', e => {
+			$('.zoom-frame .zoom-control').show();
+			$('.zoom-frame .frame-value').hide();
+		});
+
+		$('.zoom-frame').on('click', '.zoom-control', e => {
+			this.zoomSelectOpen = true;
+		});
+
+		$('.zoom-frame').on('change', '.zoom-control', e => {
+			$('.zoom-frame .zoom-control').hide();
+			$('.zoom-frame .frame-value').show();
+			this.zoomSelectOpen = false;
+			
+			var newZoom = (parseFloat($(e.target).val())/100.0).toFixed(2);
+
+			this.setZoom(newZoom);
+		});
+
+		$('.zoom-frame').on('blur', '.zoom-control', e => {
+			$('.zoom-frame .zoom-control').hide();
+			$('.zoom-frame .frame-value').show();
+			this.zoomSelectOpen = false;
+		});
+
+		$('.zoom-frame').on('mouseleave', e => {
+			if (!this.zoomSelectOpen) {
+				$('.zoom-frame .zoom-control').hide();
+				$('.zoom-frame .frame-value').show();
+			}
+		});
 	}
 
 	loadedImage() {
@@ -498,7 +534,12 @@ class Editor {
 		this.activeProject.update();
 	}
 
-	setZoom(previousZoom) {
+	setZoom(newZoom) {
+		if (newZoom !== undefined) {
+			this.zoom = newZoom;
+			this.activeProject.editorInfo.zoom = this.zoom;
+		}
+
 		var info = this.activeProject.editorInfo;
 
 		var newWidth = this.activeProject.baseDimensions.w * info.zoom;
