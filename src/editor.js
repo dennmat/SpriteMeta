@@ -9,6 +9,9 @@ var Project = require('./project.js');
 var Elements = require('./elements');
 var Tools = require('./tools.js');
 
+var SelectionController = require('./selectioncontroller.js').Controller;
+var SpriteSelector = require('./selectioncontroller.js').SpriteSelector;
+
 var StatusBarController = require('./statusbar.js');
 
 function Image() {
@@ -27,19 +30,6 @@ class Editor {
 		this.zoom = 1;
 		this.scrollInterval = null;
 
-		this.dragging = false;
-		this.dragInfo = null;
-
-		this.selecting = false;
-		this.selectionRegion = null;
-		this.selection = null;
-
-		//For selecting multiple sprites:
-		this.selected = [];
-		this.multiSelecting = false;
-
-		this.mousePos = new Utils.Rect();
-
 		this.tools = new Tools();
 
 		this.focusedElement = null;
@@ -50,6 +40,13 @@ class Editor {
 		this.build();
 
 		this.statusBar = new StatusBarController(this);
+		this.selectionController = new SelectionController(this, Elements.Selection, {
+			container: this.getEditorContainer(),
+			parent: this.getEditorContainer()
+		});
+		this.spriteSelector = new SpriteSelector(this, {
+			parent: this.getEditorContainer()
+		});
 	}
 
 	build() {
@@ -73,6 +70,9 @@ class Editor {
 			this.statusBar.editorLoaded();
 			this.statusBar.updateStatus();
 
+			this.selectionController.editorLoaded();
+			this.spriteSelector.editorLoaded();
+
 			this.delegate();
 		});
 	}
@@ -91,103 +91,27 @@ class Editor {
 	}
 
 	removeSelection() {
-		this.selection.destroy();
+		this.selectionController.destroy();
 		this.selection = null;
 
 		this.tools.disableSelectionTools();
 	}
 
-	handleDrag(e) {
-		var wasDragged = this.dragging;
-		this.dragging = false;
-		
-		$(window).unbind("mousemove");
+	hasNewSelection(selection) {} 
 
-		if (!wasDragged || this.dragInfo === null) {
-			return;
-		}
-
-		var deltaX = (e.pageX - this.dragInfo.x);
-		var deltaY = (e.pageY - this.dragInfo.y);
-
-		var current_pos = this.image_canvas.position();
-		
-		this.activeProject.setImagePosition(current_pos.left + deltaX, current_pos.top + deltaY);
-
-		this.setPos(deltaX, deltaY);
-
-		this.dragInfo = null;
-	}
-
-	handleSelection(e) {
-		var wasSelecting = this.selecting;
-		this.selecting = false;
-
-		$(window).unbind("mousemove");
-
-		if (!wasSelecting || this.selectionRegion === null) {
-			return;
-		}
-
-		var container = this.getEditorContainer();
-		var relative = container.offset();
-		var info = this.activeProject.editorInfo;
-
-		var newXY = this.activeProject.relativePosToImagePos(
-			parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom, 
-			parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom
-		);
-
-		newXY.removeZoom(this.zoom);
-
-		this.selection.setDimensions(newXY.x, newXY.y);
-
-		this.selectionRegion = null;
-		this.selectionMade();
-	}
-
-	selectionMade() {
-		Elements.Selection.updateOptions(this.selection);
+	selectionMade(selection) {
+		Elements.Selection.updateOptions(selection);
 		this.tools.enableSelectionTools();
+		this.focus(selection);
+	}
+
+	selectionUpdate() {
+		this.setOptions();
 	}
 
 	focus(element, isMulti=false) {
 		if (this.focusedElement !== null) {
 			this.focusedElement.blur()
-		}
-
-		if (isMulti) {
-			if (this.focusedElement !== null && this.focusedElement != element) {
-				this.selected.push(this.focusedElement);
-				this.focusedElement.element.addClass('focused');
-				this.focusedElement = null;
-			}
-
-			this.multiSelecting = true;
-			
-			this.selected.push(element);
-
-			element.element.addClass('focused');
-			
-			if (this.selected.length <= 2) {
-				this.setOptions();
-			} else {
-				Editor.updateMultiSelectOptions(this);
-			}
-		} else {
-			if (this.multiSelecting) {
-				this.multiSelecting = false;
-
-				for (var s of this.selected) {
-					s.blur();
-				}
-
-				this.selected.length = 0;
-			}
-
-			this.focusedElement = element;
-			this.focusedElement.receiveFocus();
-			this.setOptions();
 		}
 	}
 
@@ -202,77 +126,32 @@ class Editor {
 		this.setOptions();
 	}
 
-	clearSelection() {
-		if (this.selection === null) {
-			return;
-		}
-
-		this.clearFocus();
-		this.selection.destroy();
-		this.selection = null;
-		this.selectionRegion = null;
-	}
-
-	clearSelected() {
-		if (!this.multiSelecting) {
-			return;
-		}
-
-		for (var s of this.selected) {
-			s.blur();
-		}
-
-		this.selected.length = 0;
-		this.multiSelecting = false;
-
-		this.setOptions();
-	}
-
 	clearOptions() {
 		this.element.find('.tool-options').empty();
 	}
 
 	setOptions() {
-		this.element.find('.tool-options').empty();
-		
-		if (this.focusedElement === null && !this.multiSelecting) {
+		this.clearOptions();
+		console.log("HERE FIRST");		
+		if (this.focusedElement === null && !(this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection())) {
 			return;
 		}
 
-		if (this.multiSelecting) {
+		console.log("HERE");
+		if (this.spriteSelector.hasMultiSelection()) {
+			console.log("MADE IT");
 			this.element.find('.tool-options').append(Editor.getMultiSelectElement(this));
 		} else {
-			this.element.find('.tool-options').append(this.focusedElement.renderOptions());
+			console.log("HUH");
+			if (this.selectionController.hasSelection()) {
+				this.element.find('.tool-options').append(this.selectionController.selection.renderOptions());
+			} else {
+				this.element.find('.tool-options').append(this.spriteSelector.selected[0].renderOptions());
+			}
 		}
 	}
 
 	delegate() {
-		/*$(window).on('keyup', e => {
-			if (this.focusedElement === null) {
-				return true;
-			}
-
-			var cnt = false;
-			for (var kc in Utils.KeyCodes) {
-				if (Utils.KeyCodes[kc] === e.keycode) {
-					cnt = true;
-					break;
-				}
-			}
-
-			if (!cnt) {
-				return true;
-			}
-			
-			if (this.focusedElement.keyUpEvent(e)) {
-				e.preventDefault();
-				e.stopPropagation();
-				return false;
-			}
-		});*/
-
-		/*$(window).keydown(e => { e.preventDefault(); });*/
-
 		this.element.on('click', '.tools-container a', e => {
 			e.preventDefault();
 
@@ -297,94 +176,6 @@ class Editor {
 				this.activeProject.path = path;
 				this.resetImage();
 			}, '.jpg, .jpeg, .png, .gif, .bmp');
-		});
-
-		this.element.on('mousedown', '.image-holder', e => {
-			e.preventDefault();
-
-			if (this.multiSelecting) {
-				this.clearSelected();
-				return false;
-			}
-
-			if (this.selection) {
-				this.clearSelection();
-				return false;
-			}
-
-			if (this.focusedElement) {
-				this.clearFocus();
-				return false;
-			}
-			
-			if (e.shiftKey) {
-
-				$(window).mousemove(we => {
-					we.preventDefault();
-
-					this.dragging = true;
-					this.dragInfo = {x: we.pageX, y: we.pageY};
-					
-					$(window).unbind("mousemove");
-				});
-
-			} else {
-
-				$(window).mousemove(we => {
-					we.preventDefault();
-
-					if (this.selection !== null && !this.selecting) {
-						return;
-					}
-
-					var container = this.getEditorContainer();
-					var relative = container.offset();
-					
-					if (this.selecting) {
-						var info = this.activeProject.editorInfo;
-
-						var newXY = this.activeProject.relativePosToImagePos(
-								parseInt(((we.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom, 
-								parseInt(((we.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom
-						);
-
-						newXY.removeZoom(this.zoom);
-
-						this.selection.setDimensions(newXY.x, newXY.y);
-					} else {
-						var info = this.activeProject.editorInfo;
-						this.selecting = true;
-
-						var x = parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom;
-						var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
-						
-						var region = new Utils.Rect(x, y);
-						var adjustedPos = this.activeProject.relativePosToImagePos(region.x, region.y);
-						
-						adjustedPos.w = region.w;
-						adjustedPos.h = region.h;
-
-						adjustedPos.removeZoom(this.zoom);
-
-						this.selectionRegion = adjustedPos;
-						this.selection = new Elements.Selection(this, this.selectionRegion);
-						
-						this.focus(this.selection);
-					}
-				});
-
-			}
-		});
-		
-		this.element.on('mouseup', '.image-holder,.selection,.pointer', e => {
-			e.preventDefault();
-			
-			if (this.dragging) {
-				this.handleDrag(e);
-			}
-			if (this.selecting) {
-				this.handleSelection(e);
-			}
 		});
 		
 		this.element.on('mousewheel', '.right-pane', e => {
@@ -440,36 +231,6 @@ class Editor {
 				this.openFile($(d.target).val());
 			});
 		});
-
-		$('body').on('mousemove', '.image-holder', e=> {
-			var container = this.getEditorContainer();
-			var relative = container.offset();
-			var info = this.activeProject.editorInfo;
-			
-			var pointer = this.container.find('.pointer');
-			var x = parseInt(((e.pageX - relative.left) + container.get(0).scrollLeft) / info.zoom) * info.zoom;
-			var y = parseInt(((e.pageY - relative.top) + container.get(0).scrollTop) / info.zoom) * info.zoom;
-
-			this.mousePos.x = parseInt(x/info.zoom);
-			this.mousePos.y = parseInt(y/info.zoom);
-
-			pointer.css({
-				left: x,
-				top: y
-			});
-
-			this.statusBar.updateStatus();
-		});
-
-		this.element.on('click', '.sprite-box', e => {
-			//e.preventDefault();
-			
-			var spriteBox = $(e.target);
-
-			var sprite = this.activeProject.getSpriteByUID(spriteBox.data('uid'));
-
-			this.focus(sprite, e.ctrlKey);
-		});
 	}
 
 	loadedImage() {
@@ -492,8 +253,8 @@ class Editor {
 			top: info.pos.y.toString() + 'px'
 		});
 
-		if (this.selection !== null) {
-			this.selection.reposition();
+		if (this.selectionController.selection !== null) {
+			this.selectionController.selection.reposition();
 		}
 
 		this.activeProject.update();
@@ -525,8 +286,8 @@ class Editor {
 			ctx.drawImage(this.image_object, 0, 0, newWidth, newHeight);
 		}
 
-		if (this.selection !== null) { //FIXME: short term fix
-			this.selection.reposition();
+		if (this.selectionController.selection !== null) { //FIXME: short term fix
+			this.selectionController.selection.reposition();
 		}
 
 		this.activeProject.update();
@@ -667,7 +428,7 @@ Editor.getMultiSelectElement = function(editor) {
 		var type = element.find('.mover-type').val();
 		var delta = parseInt(element.find('.mover-amount').val()) * -1;
 
-		for (var sprite of editor.selected) {
+		for (var sprite of editor.spriteSelector.selected) {
 			if (type == 'position') {
 				sprite.alterPosition(delta, Utils.KeyCodes.UP);
 			} else {
@@ -680,7 +441,7 @@ Editor.getMultiSelectElement = function(editor) {
 		var type = element.find('.mover-type').val();
 		var delta = parseInt(element.find('.mover-amount').val());
 
-		for (var sprite of editor.selected) {
+		for (var sprite of editor.spriteSelector.selected) {
 			if (type == 'position') {
 				sprite.alterPosition(delta, Utils.KeyCodes.DOWN);
 			} else {
@@ -693,7 +454,7 @@ Editor.getMultiSelectElement = function(editor) {
 		var type = element.find('.mover-type').val();
 		var delta = parseInt(element.find('.mover-amount').val()) * -1;
 
-		for (var sprite of editor.selected) {
+		for (var sprite of editor.spriteSelector.selected) {
 			if (type == 'position') {
 				sprite.alterPosition(delta, Utils.KeyCodes.LEFT);
 			} else {
@@ -706,7 +467,7 @@ Editor.getMultiSelectElement = function(editor) {
 		var type = element.find('.mover-type').val();
 		var delta = parseInt(element.find('.mover-amount').val());
 
-		for (var sprite of editor.selected) {
+		for (var sprite of editor.spriteSelector.selected) {
 			if (type == 'position') {
 				sprite.alterPosition(delta, Utils.KeyCodes.RIGHT);
 			} else {
@@ -722,14 +483,18 @@ Editor.getMultiSelectElement = function(editor) {
 };
 
 Editor.updateMultiSelectOptions = function(editor) {
-	var element = Editor.MultiSelectElement;
+	if (Editor.MultiSelectElement !== null) {
+		var element = Editor.MultiSelectElement;
+	} else {
+		var element = Editor.getMultiSelectElement(editor);
+	}
 
-	element.find('.selected-sprites-count').text(editor.selected.length);
+	element.find('.selected-sprites-count').text(editor.spriteSelector.selected.length);
 
 	var ul = element.find('.currently-selected-sprites');
 	ul.empty();
 
-	for (var sprite of editor.selected) {
+	for (var sprite of editor.spriteSelector.selected) {
 		ul.append(
 			$('<li><\/li>', {text: sprite.name})
 		);

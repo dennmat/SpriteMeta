@@ -114,6 +114,15 @@ $black: #000;
 			}
 		}
 
+		.info-frame {
+			text-align: center;
+			
+			i {
+				display: none;
+				margin-right: 5px;
+			}
+		}
+
 		.frame-value {
 			color: #DDD;
 		}

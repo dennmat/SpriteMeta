@@ -12,7 +12,7 @@ class Selection extends Focusable {
 		this.editor = editor;
 
 		this.rect = (rect !== undefined)? rect : new Utils.Rect();
-		this.originalRect = (rect !== undefined)? rect.copy() : new Utils.Rect();;
+		this.originalRect = (rect !== undefined)? rect.copy() : new Utils.Rect();
 
 		this.element = null;
 
@@ -84,7 +84,16 @@ class Selection extends Focusable {
 		this.repositionSubSelects();
 	}
 
-	setDimensions(x, y) {
+	updateSelection(rect) {
+		this.rect = rect;
+		this.reposition();
+	}
+
+	selectionMade() {
+
+	}
+
+	/*setDimensions(x, y) {
 		var tempRect = new Utils.Rect(
 			parseInt(Math.min(this.originalRect.x, x)),
 			parseInt(Math.min(this.originalRect.y, y)), 
@@ -95,7 +104,7 @@ class Selection extends Focusable {
 		this.rect = tempRect;
 
 		this.reposition();
-	}
+	}*/
 
 	repositionSubSelects() {
 		for (var sub of this.subSelects) {
@@ -507,6 +516,11 @@ Selection.updateOptions = function(selection) {
 	});
 
 	Selection.delegate();
+};
+
+Selection.acceptSelection = function(editor) {
+	var selection = new Selection(editor);
+	return selection;
 };
 
 module.exports = {

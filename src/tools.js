@@ -48,7 +48,7 @@ class GroupTool extends Tool {
 	}
 
 	handle(editor) {
-		var selection = editor.selection;
+		var selection = editor.selectionController.selection;
 		var project = editor.activeProject;
 
 		var group = new Elements.Group(editor, {
@@ -58,7 +58,7 @@ class GroupTool extends Tool {
 		project.addGroup(group);
 
 		editor.focus(group);
-		editor.removeSelection();
+		editor.selectionController.clearSelection();
 	}
 
 	requiresSelection() { return true; }
@@ -75,7 +75,7 @@ class SpriteTool extends Tool {
 	}
 
 	handle(editor) {
-		var selection = editor.selection;
+		var selection = editor.selectionController.selection;
 		var project = editor.activeProject;
 
 		var sprites = selection.getSelections();
@@ -94,7 +94,7 @@ class SpriteTool extends Tool {
 			editor.focus(spriteObj);
 		}
 
-		editor.removeSelection();
+		editor.selectionController.clearSelection();
 	}
 
 	requiresSelection() { return true; }
