@@ -123,6 +123,17 @@ class SelectionController {
 
 		if (this.selection !== null) {
 			this.clearSelection();
+			this.editor.setOptions();
+			return;
+		}
+
+		if ($('.sprite-box:hover').length > 0) {
+			return;
+		}
+		
+		if (this.editor.spriteSelector.hasMultiSelection() || this.editor.spriteSelector.hasSelection()) {
+			this.editor.spriteSelector.clearSelection();
+			this.editor.setOptions();
 			return;
 		}
 
@@ -145,6 +156,7 @@ class SelectionController {
 
 	mouseUp(e) {
 		e.preventDefault();
+		//e.stopPropagation();
 
 		this.options.container.off('mousemove.'+this.eventNs+'-mousemove');
 
@@ -208,12 +220,18 @@ class SpriteSelector {
 	}
 
 	hasMultiSelection() {
-		console.log("CHECKING MULTI RESULT", this.selected.length > 1);
 		return this.selected.length > 1;
 	}
 
 	spriteClick(e) {
 		e.preventDefault();
+		e.stopPropagation();
+
+		if (this.editor.selectionController.hasSelection()) {
+			this.editor.selectionController.clearSelection();
+			this.editor.setOptions();
+			return; 
+		}
 
 		var sprite = this.editor.activeProject.getSpriteByUID($(e.target).data('uid'));
 

@@ -102,7 +102,7 @@ class Editor {
 	selectionMade(selection) {
 		Elements.Selection.updateOptions(selection);
 		this.tools.enableSelectionTools();
-		this.focus(selection);
+		this.setOptions();
 	}
 
 	selectionUpdate() {
@@ -126,23 +126,35 @@ class Editor {
 		this.setOptions();
 	}
 
+	clearSelections() {
+		var cleared = false;
+
+		if (this.selectionController.hasSelection()) {
+			cleared = true;
+			this.selectionController.clearSelection();
+		} else if (this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection()) {
+			cleared = true;
+			this.spriteSelector.clearSelection();
+		}
+
+		return cleared;
+	}
+
 	clearOptions() {
 		this.element.find('.tool-options').empty();
 	}
 
 	setOptions() {
 		this.clearOptions();
-		console.log("HERE FIRST");		
-		if (this.focusedElement === null && !(this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection())) {
+
+		if (this.focusedElement === null && !(this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection() || this.selectionController.hasSelection())) {
 			return;
 		}
 
-		console.log("HERE");
+		
 		if (this.spriteSelector.hasMultiSelection()) {
-			console.log("MADE IT");
 			this.element.find('.tool-options').append(Editor.getMultiSelectElement(this));
 		} else {
-			console.log("HUH");
 			if (this.selectionController.hasSelection()) {
 				this.element.find('.tool-options').append(this.selectionController.selection.renderOptions());
 			} else {
