@@ -32,8 +32,6 @@ class Editor {
 
 		this.tools = new Tools();
 
-		this.focusedElement = null;
-
 		this.image_object = null;
 
 		this.element = null;
@@ -109,23 +107,6 @@ class Editor {
 		this.setOptions();
 	}
 
-	focus(element, isMulti=false) {
-		if (this.focusedElement !== null) {
-			this.focusedElement.blur()
-		}
-	}
-
-	clearFocus() {
-		if (this.focusedElement === null) {
-			return;
-		}
-
-		this.focusedElement.blur();
-		this.focusedElement = null;
-
-		this.setOptions();
-	}
-
 	clearSelections() {
 		var cleared = false;
 
@@ -147,7 +128,7 @@ class Editor {
 	setOptions() {
 		this.clearOptions();
 
-		if (this.focusedElement === null && !(this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection() || this.selectionController.hasSelection())) {
+		if (!(this.spriteSelector.hasSelection() || this.spriteSelector.hasMultiSelection() || this.selectionController.hasSelection())) {
 			return;
 		}
 
@@ -163,25 +144,21 @@ class Editor {
 		}
 	}
 
+	bindButton(selector, callback) {
+		this.element.on('click', selector, e => {
+			e.preventDefault();
+			$.proxy(callback, this)(e);
+		});
+	}
+
 	delegate() {
-		this.element.on('click', '.tools-container a', e => {
-			e.preventDefault();
+		this.bindButton('.tools-container a', e => { this.tools.toolEvent($(e.target), this); });
 
-			this.tools.toolEvent($(e.target), this);
-		});
+		this.bindButton('.editor-save-spriter', e => { this.saveFile(); });
 
-		this.element.on('click', '.editor-save-spriter', e => {
-			e.preventDefault();
-			this.saveFile();
-		});
+		this.bindButton('.editor-export-spriter', e => { this.exportProject(); });
 
-		this.element.on('click', '.editor-export-spriter', e => {
-			e.preventDefault();
-			this.exportProject();
-		});
-
-		this.element.on('click', '.editor-load-spritesheet', e => {
-			e.preventDefault();
+		this.bindButton('.editor-load-spritesheet', e => {
 			Utils.openDialog(d => {
 				var path = $(d.target).val();
 
@@ -190,45 +167,7 @@ class Editor {
 			}, '.jpg, .jpeg, .png, .gif, .bmp');
 		});
 		
-		this.element.on('mousewheel', '.right-pane', e => {
-			if (!e.altKey) {
-				return true;
-			}
-
-			e.preventDefault();
-			e.stopPropagation();
-
-			clearInterval(this.scrollInterval); //Reset the interval
-
-			this.scrollInterval = setInterval(() => { //We don't want to fire this 20x for one physical scroll
-				var wd = e.originalEvent.wheelDelta;
-
-				var currentZoom = this.zoom;
-
-				if (wd < 0) { //Down
-					this.zoom -= Math.abs(wd)/1000;
-				} else { //Up
-					this.zoom += Math.abs(wd)/1000;
-				}
-
-				if (this.zoom <= 0) {
-					this.zoom = 0.1;
-				} else if (this.zoom > 10) {
-					this.zoom = 10;
-				}
-
-				this.zoom = parseFloat(this.zoom.toFixed(2));
-
-				this.activeProject.editorInfo.zoom = this.zoom;
-
-				this.setZoom();
-				
-				clearInterval(this.scrollInterval);
-				this.statusBar.updateStatus();
-			}, 50);
-
-			return false;
-		});
+		this.element.on('mousewheel', '.right-pane', $.proxy(this.handleScroll, this));
 
 		$('body').on('click', '#sp-newSpriter', e => {
 			e.preventDefault();
@@ -270,6 +209,46 @@ class Editor {
 		}
 
 		this.activeProject.update();
+	}
+
+	handleScroll(e) {
+		if (!e.altKey) {
+			return true;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		clearInterval(this.scrollInterval); //Reset the interval
+
+		this.scrollInterval = setInterval(() => { //We don't want to fire this 20x for one physical scroll
+			var wd = e.originalEvent.wheelDelta;
+
+			var currentZoom = this.zoom;
+
+			if (wd < 0) { //Down
+				this.zoom -= Math.abs(wd)/1000;
+			} else { //Up
+				this.zoom += Math.abs(wd)/1000;
+			}
+
+			if (this.zoom <= 0) {
+				this.zoom = 0.1;
+			} else if (this.zoom > 10) {
+				this.zoom = 10;
+			}
+
+			this.zoom = parseFloat(this.zoom.toFixed(2));
+
+			this.activeProject.editorInfo.zoom = this.zoom;
+
+			this.setZoom();
+			
+			clearInterval(this.scrollInterval);
+			this.statusBar.updateStatus();
+		}, 50);
+
+		return false;
 	}
 
 	setZoom(newZoom) {
@@ -420,10 +399,6 @@ class Editor {
 
 	postSave() {
 		this.tabManager.updateTabName(this.activeProject.id, this.activeProject.name);
-	}
-
-	exportFile() {
-
 	}
 }
 

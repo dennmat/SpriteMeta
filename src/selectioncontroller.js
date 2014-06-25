@@ -50,8 +50,8 @@ class SelectionController {
 
 		this.rect = new Utils.Rect();
 
-		this.editor.clearFocus();
 		this.editor.statusBar.setInfo('');
+		this.editor.selectionUpdate();
 	}
 
 	rehook() {
@@ -123,7 +123,6 @@ class SelectionController {
 
 		if (this.selection !== null) {
 			this.clearSelection();
-			this.editor.setOptions();
 			return;
 		}
 
@@ -229,7 +228,6 @@ class SpriteSelector {
 
 		if (this.editor.selectionController.hasSelection()) {
 			this.editor.selectionController.clearSelection();
-			this.editor.setOptions();
 			return; 
 		}
 
