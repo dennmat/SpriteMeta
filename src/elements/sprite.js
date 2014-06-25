@@ -12,6 +12,8 @@ class Sprite extends (Base.Element, Base.Focusable) {
 
 		if (info !== undefined) {
 			this.load(info);
+		} else {
+			this.id = Utils.generateId();
 		}
 
 		this.build();
@@ -38,6 +40,12 @@ class Sprite extends (Base.Element, Base.Focusable) {
 		if (info.name !== undefined) {
 			this.name = info.name;
 		}
+
+		if (info.id !== undefined) {
+			this.id = info.id;
+		} else {
+			this.id = Utils.generateId(); //Temporary backwards compat remove by v0.5 TODO
+		}
 	}
 
 	build() {
@@ -56,7 +64,8 @@ class Sprite extends (Base.Element, Base.Focusable) {
 	serialize() {
 		return {
 			rect: this.rect.toDict(),
-			name: this.name
+			name: this.name,
+			id: this.id
 		}
 	}
 

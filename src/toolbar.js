@@ -1,9 +1,11 @@
 var Utils = require('./utils.js');
 
+var Animation = require('./elements').Animation;
+
 class Animation {
-	constructor(editor, project) {
+	constructor(editor) {
 		this.editor = editor;
-		this.project = project;
+		this.project = this.editor.activeProject;
 
 		this.largestWidth = 0;
 		this.largestHeight = 0;
@@ -18,7 +20,7 @@ class Animation {
 		this.loop = false;
 		this.playInterval = null;
 
-		this.uid = Animation.UID_COUNTER++;
+		this.id = utils.generateId();
 	}
 
 	addFrame(sprite, duration=500) {
@@ -65,16 +67,32 @@ class Animation {
 			//render the frame
 		}
 	}
-}
 
-Animation.UID_COUNTER = 0;
+	serialize() {
+		var frames = [];
+
+		for (var frame of this.frames) {
+			frames.push({
+				duration: frame.duration,
+				sprite: frame.sprite.id //TODO Figure something out for exporting
+			});
+		}
+
+		return {
+			frames: frames,
+			name: this.name,
+			id: this.id
+		};
+	}
+}
 
 class AnimationTab {
 	constructor(toolBar, editor) {
 		this.toolBar = toolBar;
 		this.editor = editor;
 
-		this.animations = [];
+		//This should be changed when projects changed and eventually moved to storage on the project and 
+		this.animations = null;
 
 		this.selected = null;
 	}
@@ -89,21 +107,18 @@ class AnimationTab {
 
 	loadAnimations() {
 		var project = this.editor.activeProject;
-
-		//TODO For loading from file
+		this.animations = project.animations;
 	}
 
-	addAnimation() {
-		this.animations.push({
+	addAnimation(animation=null) {
+		if (animation === null) {
+			animation = new Animation(this.editor);	
+		}
 
-		});
+		this.editor.activeProject.addAnimation(animation);
 	}
 
 	removeAnimation() {
-
-	}
-
-	serialize() {
 
 	}
 

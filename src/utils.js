@@ -12,6 +12,17 @@ function saveDialog(callback, accepted_types='.sprtr') {
 	$('#saveFileDialog').change(callback);
 }
 
+function generateId() {
+	var charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+	var result = "";
+
+	for(var i = 0; i < 10; i++) {
+		result += charSet.charAt(Math.floor(Math.random() * charSet.length));
+	}
+	
+	return result;
+}
+
 class Rect {
 	constructor(x=0, y=0, w=0, h=0) {
 		this.x = x;
@@ -124,6 +135,7 @@ var KeyCodes = {
 module.exports = {
 	"openDialog": openDialog,
 	"saveDialog": saveDialog,
+	"generateId": generateId,
 	"Rect": Rect,
 	"KeyCodes": KeyCodes,
 	"Orient": Orient

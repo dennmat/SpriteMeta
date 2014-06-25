@@ -18,9 +18,10 @@ class Project {
 
 		this.group = {};
 		this.sprites = [];
+		this.animations = [];
 
 		this.baseDimensions = new Utils.Rect();
-		
+
 		this.editorInfo = {
 			zoom: 1,
 			pos: new Utils.Rect()
@@ -51,6 +52,13 @@ class Project {
 					name: sprite.name
 				});
 				this.addSprite(spriteObj, false);
+			}
+		}
+
+		if (data.animations) {
+			for (var animation of data.animations) {
+				var animationObj = new Elements.Animation(this.editor, animation);
+				this.addAnimation(animationObj);
 			}
 		}
 	}
@@ -105,6 +113,11 @@ class Project {
 		}
 	}
 
+	addAnimation(animation) {
+		this.animations.push(animation);
+		this.markDirty(true);
+	}
+
 	addGroup(group) {
 		var id = 'group-' + (++Project._group_count).toString();
 		group.setId(id);
@@ -122,6 +135,17 @@ class Project {
 		}
 	}
 
+	getSpriteFromId(id) {
+		for (var sprite of this.sprites) {
+			if (sprite.id === id) {
+				return sprite;
+			}
+		}
+
+		return null;
+	}
+
+	//Deprecated Clean This Up
 	getSpriteByUID(uid) {
 		for (var sprite of this.sprites) {
 			if (sprite.uid === parseInt(uid)) {
@@ -137,6 +161,16 @@ class Project {
 
 		var idx = this.sprites.indexOf(sprite);
 		this.sprites.splice(idx,1);
+	}
+
+	serializeAnimations() {
+		var animations = [];
+
+		for (var animation of this.animations) {
+			animations.push(animation.serialize());
+		}
+
+		return animations;
 	}
 
 	serializeGroups() {
