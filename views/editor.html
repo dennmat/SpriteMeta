@@ -10,14 +10,24 @@
 				<li data-tab='tools' class='selected'>Tools</li>
 				<li data-tab='animation'>Animations</li>
 			</ul>
-			<div class='tab-body tools-tab'>
+			<div class='tab-body tools-tab' data-tab='tools'>
 				<div class="tools-container">
 				</div>
 				<p class="section-label">Options</p>
 				<div class="tool-options">
 				</div>
 			</div>
-			<div class="tab-body animation-tab" style="display: none;">
+			<div class="tab-body animation-tab" data-tab='animation' style="display: none;">
+				<div class="existing-animations">
+					<ul class="element-selector animation-selector">
+					</ul>
+				</div>
+				<div class="selected-animation" style="display: none;">
+					<ul class="element-selector frame-selector">
+					</ul>
+					<div class="frame-options">
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="right-pane">

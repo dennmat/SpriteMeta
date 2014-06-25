@@ -26,3 +26,100 @@
    -webkit-user-select: none;
 }
 
+body {
+    font-family: 'Roboto';
+    -webkit-font-smoothing: subpixel-antialiased !important; 
+    -webkit-backface-visibility: hidden; 
+    -moz-backface-visibility: hidden; 
+    -ms-backface-visibility: hidden;
+}
+
+#start-page {
+    text-align: center;
+}
+
+.button {
+    border: 0 none;
+    border-radius: 2px 2px 2px 2px;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Arial,sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 20px;
+    margin-bottom: 0;
+    margin-top: 10px;
+    padding: 7px 10px;
+    text-transform: none;
+    transition: all 0.3s ease 0s;
+    /*  width: 16.795%;*/
+    /* auto */
+    text-align: center;
+    /* DELETE WHEN WIDTH AUTO */
+}
+
+.button:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button i {
+    margin: 0 5px;
+}
+
+.button.red {
+    background: none repeat scroll 0 0 #e0645c;
+    color: white;
+}
+.button.red:hover {
+    background: none repeat scroll 0 0 #999999;
+    color: white;
+}
+.button.dark {
+    background: none repeat scroll 0 0 #444444;
+    color: white;
+}
+.button.dark:hover {
+    background: none repeat scroll 0 0 #2db6cf;
+    color: white;
+}
+.button.light {
+    background: none repeat scroll 0 0 #999999;
+    color: white;
+}
+.button.light:hover {
+    background: none repeat scroll 0 0 #444444;
+    color: white;
+}
+.button.green {
+    background: none repeat scroll 0 0 #46b98a;
+    color: white;
+}
+.button.green:hover {
+    background: none repeat scroll 0 0 #444444;
+    color: white;
+}
+.button.blue {
+    background: none repeat scroll 0 0 #2db6cf;
+    color: white;
+}
+.button.blue:hover {
+    background: none repeat scroll 0 0 #444444;
+    color: white;
+}
+
+.top-bar, .center {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.top-bar {
+    height: 5%;
+    line-height: 22px;
+    padding: 0 26px;
+}
+
+.center {
+    height: 91%;
+}

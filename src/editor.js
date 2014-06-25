@@ -8,6 +8,7 @@ var Project = require('./project.js');
 
 var Elements = require('./elements');
 var Tools = require('./tools.js');
+var Toolbar = require('./toolbar.js');
 
 var SelectionController = require('./selectioncontroller.js').Controller;
 var SpriteSelector = require('./selectioncontroller.js').SpriteSelector;
@@ -38,10 +39,13 @@ class Editor {
 		this.build();
 
 		this.statusBar = new StatusBarController(this);
+		this.toolBar = new Toolbar(this);
+
 		this.selectionController = new SelectionController(this, Elements.Selection, {
 			container: this.getEditorContainer(),
 			parent: this.getEditorContainer()
 		});
+
 		this.spriteSelector = new SpriteSelector(this, {
 			parent: this.getEditorContainer()
 		});
@@ -67,6 +71,8 @@ class Editor {
 
 			this.statusBar.editorLoaded();
 			this.statusBar.updateStatus();
+
+			this.toolBar.editorLoaded();
 
 			this.selectionController.editorLoaded();
 			this.spriteSelector.editorLoaded();
