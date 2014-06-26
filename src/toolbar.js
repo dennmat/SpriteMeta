@@ -2,97 +2,13 @@ var Utils = require('./utils.js');
 
 var Animation = require('./elements').Animation;
 
-class Animation {
-	constructor(editor) {
-		this.editor = editor;
-		this.project = this.editor.activeProject;
-
-		this.largestWidth = 0;
-		this.largestHeight = 0;
-
-		this.frames = []; //aka sprites, order matters
-
-		this.name = '';
-
-		//For rendering the animation
-		this.frame = 0;
-		this.sinceLastFrame = 0;
-		this.loop = false;
-		this.playInterval = null;
-
-		this.id = utils.generateId();
-	}
-
-	addFrame(sprite, duration=500) {
-		//Duration in ms
-
-		if (sprite.w > this.largestWidth) {
-			this.largestWidth = sprite.w;
-		}
-
-		if (sprite.h > this.largestHeight) {
-			this.largestHeight = sprite.h;
-		}
-
-		this.frames.push({
-			duration: duration,
-			sprite: sprite
-		});
-	}
-
-	play(renderTo) {
-		renderTo.css({
-			'min-width': this.largestWidth + 'px',
-			'min-height': this.largestHeight + 'px'
-		});
-
-		this.sinceLastFrame = Date.now();
-		this.playInterval = setInterval($.proxy(this.tick, this), 10);
-	}
-
-	tick(renderTo) {
-		if (this.frames[this.frame].duration >= Date.now() - this.sinceLastFrame) {
-			this.sinceLastFrame = Date.now();
-			this.frame++;
-
-			if (this.frame == this.frames.length) {
-				if (this.loop) {
-					this.frame = 0; 
-				} else {
-					clearInterval(this.playInterval);
-					this.playInterval = null;
-					return;
-				}
-			}
-			//render the frame
-		}
-	}
-
-	serialize() {
-		var frames = [];
-
-		for (var frame of this.frames) {
-			frames.push({
-				duration: frame.duration,
-				sprite: frame.sprite.id //TODO Figure something out for exporting
-			});
-		}
-
-		return {
-			frames: frames,
-			name: this.name,
-			id: this.id
-		};
-	}
-}
-
 class AnimationTab {
 	constructor(toolBar, editor) {
 		this.toolBar = toolBar;
 		this.editor = editor;
 
 		//This should be changed when projects changed and eventually moved to storage on the project and 
-		this.animations = null;
+		//this.animations = null;
 
 		this.selected = null;
 	}
@@ -103,6 +19,57 @@ class AnimationTab {
 		this.element.on('click', '.existing-animations li', e => {
 			e.preventDefault();
 		});
+
+		this.element.on('click', '.new-animation', e => {
+			e.preventDefault();
+
+			this.addAnimation();
+		});
+
+		this.element.on('click', '.frame-selector li', e => {
+			e.preventDefault();
+
+			this.ui.frames.find('.selected').removeClass('selected');
+
+			$(e.target).addClass('selected');
+
+			this.selectFrame($(e.target).data('frame-index'));
+		});
+
+		this.element.on('click', '.animation-preview', e => {
+			e.preventDefault();
+
+			var project = this.editor.activeProject;
+			var pf = this.ui.previewFrame;
+
+			console.log("PROJ PATh", project.path, project.path.replace('\\', '/'));
+
+			pf.css({
+				'background-image': 'url(' + project.path.replace(/\\/g, '/') + ')',
+				'background-repeat': 'none'
+			});
+
+			this.selected.play(this.ui.previewFrame);
+		});
+
+		this.ui = {
+			options: this.toolBar.element.find('.selected-animation'),
+			existing: this.toolBar.element.find('.existing-animations'),
+			existingAnimations: this.toolBar.element.find('.existing-animations .animation-selector'),
+			frames: this.toolBar.element.find('.selected-animation .frame-selector'),
+			frameOptions: this.toolBar.element.find('.frame-options'),
+			previewAnimation: this.toolBar.element.find('.animation-preview'),
+			previewFrame: this.toolBar.element.find('.preview-frame')
+		};
+	}
+
+	selectFrame(index) {
+		var frame = this.selected.frames[parseInt(index)];
+
+		this.ui.frameOptions.find('.frame-duration').val(frame.duration);
+		this.ui.frameOptions.find('.frame-sprite-name').text(frame.sprite.name);
+
+		this.ui.frameOptions.show();
 	}
 
 	loadAnimations() {
@@ -116,6 +83,82 @@ class AnimationTab {
 		}
 
 		this.editor.activeProject.addAnimation(animation);
+
+		this.refreshAnimationList();
+
+		this.selected = animation;
+		this.select();
+	}
+
+	refreshAnimationList() {
+		var project = this.editor.activeProject;
+
+		this.ui.existingAnimations.empty();
+
+		for (var animation of project.animations) {
+			this.ui.existingAnimations.append(
+				$('<li data-id="' + animation.id + '">' + animation.name + '</li>')
+			);
+		}
+	}
+
+	refreshSelected() {
+		var project = this.editor.activeProject;
+
+		this.ui.frames.empty();
+
+		var frameIndex = 0;
+		for (var frame of this.selected.frames) {
+			this.ui.frames.append(
+				$('<li data-frame-index="' + frameIndex++ + '">' + frame.sprite.name + '</li>')
+			);
+		}
+
+		if (this.selected.frames.length > 0) {
+			this.ui.previewAnimation.show();
+		} else {
+			this.ui.previewAnimation.hide();
+		}
+	}
+
+	spriteSelected(sprite) {
+		if (this.selected === null) {
+			console.log("Shouldn't get here debug time.");
+			return;
+		}
+
+		this.selected.addFrame(sprite);
+		this.refreshSelected();
+	}
+
+	select() {
+		if (this.selected === null) {
+			return;
+		}
+
+		var sprites = [];
+
+		for (var frame of this.selected.frames) {
+			sprites.push(frame.sprite);
+		}
+
+		this.editor.spriteSelector.selectSprites(sprites);
+
+		this.editor.spriteSelector.addWatcher('animation', this);
+
+		//Set Options TODO
+		this.ui.options.find('.animation-name').val(this.selected.name);
+
+		this.ui.existing.hide();
+		this.ui.options.show();
+	}
+
+	deselect() {
+		this.editor.spriteSelector.removeWatcher('animation');
+		this.editor.clearSelections();
+
+		this.ui.options.hide();
+		this.ui.existing.show();
 	}
 
 	removeAnimation() {
@@ -123,7 +166,10 @@ class AnimationTab {
 	}
 
 	selectAnimation(uid) {
+		var project = this.editor.activeProject;
+		this.selected = project.getAnimationById(uid);
 
+		this.select();
 	}
 
 	clearSelection() {

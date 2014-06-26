@@ -92,6 +92,33 @@ ul.element-selector {
 			max-height: 200px;
 			height: 200px;
 		}
+
+		.selected-animation {
+			
+			table {
+				width: 100%;
+			}
+
+			input {
+				color: #222;
+			}
+
+			.existing-frames {
+				max-height: 200px;
+				height: 200px;
+				overflow-y: auto;
+			}
+
+			.preview-frame {
+				display: block;
+				background-repeat: none;
+				
+				position: relative;
+				margin: 20px auto;
+				
+				zoom: 500%;
+			}
+		}
 	}
 
 	.left-pane {

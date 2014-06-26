@@ -202,6 +202,15 @@ class SpriteSelector {
 
 		this.selected = [];
 
+		this.watchers = {};
+	}
+
+	addWatcher(name, watcher) {
+		this.watchers[name] = watcher;
+	}
+
+	removeWatcher(name) {
+		delete this.watchers[name];
 	}
 
 	editorLoaded() {
@@ -246,6 +255,10 @@ class SpriteSelector {
 
 		sprite.element.addClass('focused');
 
+		for (var wk in this.watchers) {
+			this.watchers[wk].spriteSelected(sprite);
+		}
+
 		this.editor.selectionUpdate();
 	}
 
@@ -254,6 +267,17 @@ class SpriteSelector {
 			s.blur();
 		}
 		this.selected.length = 0;
+
+		this.editor.selectionUpdate();
+	}
+
+	selectSprites(sprites) {
+		this.editor.clearSelections();
+
+		for (var sprite of sprites) {
+			this.selected.push(sprite);
+			sprite.element.addClass('focused');
+		}
 
 		this.editor.selectionUpdate();
 	}

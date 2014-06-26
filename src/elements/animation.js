@@ -10,12 +10,12 @@ class Animation {
 
 		this.frames = []; //aka sprites, order matters
 
-		this.name = '';
+		this.name = 'Animation';
 
 		//For rendering the animation
 		this.frame = 0;
 		this.sinceLastFrame = 0;
-		this.loop = false;
+		this.loop = true;
 		this.playInterval = null;
 
 		if (info !== undefined) {
@@ -47,12 +47,12 @@ class Animation {
 	addFrame(sprite, duration=500) {
 		//Duration in ms
 
-		if (sprite.w > this.largestWidth) {
-			this.largestWidth = sprite.w;
+		if (sprite.rect.w > this.largestWidth) {
+			this.largestWidth = sprite.rect.w;
 		}
 
-		if (sprite.h > this.largestHeight) {
-			this.largestHeight = sprite.h;
+		if (sprite.rect.h > this.largestHeight) {
+			this.largestHeight = sprite.rect.h;
 		}
 
 		this.frames.push({
@@ -62,17 +62,26 @@ class Animation {
 	}
 
 	play(renderTo) {
+		this.renderTo = renderTo;
+
 		renderTo.css({
-			'min-width': this.largestWidth + 'px',
-			'min-height': this.largestHeight + 'px'
+			'width': this.largestWidth + 'px',
+			'height': this.largestHeight + 'px',
+			'background-position': -this.frames[0].sprite.rect.x + 'px ' + -this.frames[0].sprite.rect.y + 'px'
 		});
 
+		if (this.playInterval !== null) {
+			clearInterval(this.playInterval);
+		}
+
+		this.frame = 0;
 		this.sinceLastFrame = Date.now();
 		this.playInterval = setInterval($.proxy(this.tick, this), 10);
 	}
 
-	tick(renderTo) {
-		if (this.frames[this.frame].duration >= Date.now() - this.sinceLastFrame) {
+	tick() {
+		var frame = this.frames[this.frame];
+		if (frame.duration <= Date.now() - this.sinceLastFrame) {
 			this.sinceLastFrame = Date.now();
 			this.frame++;
 
@@ -85,7 +94,10 @@ class Animation {
 					return;
 				}
 			}
-			//render the frame
+
+			this.renderTo.css({
+				'background-position': -frame.sprite.rect.x + 'px ' + -frame.sprite.rect.y + 'px'
+			});
 		}
 	}
 

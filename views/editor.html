@@ -21,11 +21,38 @@
 				<div class="existing-animations">
 					<ul class="element-selector animation-selector">
 					</ul>
+					<a href="#" class="button blue new-animation"><i class='icon-plus'></i>&nbsp;New Animation</a>
 				</div>
 				<div class="selected-animation" style="display: none;">
-					<ul class="element-selector frame-selector">
-					</ul>
+					
 					<div class="frame-options">
+						<table>
+							<tr>
+								<td>Name: </td>
+								<td><input type="text" class="animation-name" /></td>
+							</tr>
+						</table>
+						<div>Frames</div>
+						<div class="existing-frames">
+							<ul class="element-selector frame-selector">
+							</ul>
+						</div>
+						<div class="frame-options" style="display: none;">
+							<table>
+								<tr>
+									<td>Duration(ms): </td>
+									<td><input type="text" class="frame-duration" /></td>
+								</tr>
+								<tr>
+									<td>Sprite: </td>
+									<td class="frame-sprite-name"></td>
+								</tr>
+							</table>
+						</div>
+						<a href="#" class="button green animation-preview" style="display: none;"><i class="icon-youtube-play"></i>&nbsp;Preview Animation</a>
+						<div class="preview-frame">
+							
+						</div>
 					</div>
 				</div>
 			</div>
