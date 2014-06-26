@@ -1,5 +1,7 @@
-spritzup (Probably not the final name)
+SpriteMeta
 ========
+
+Just changed the name, to what I think will be the final name, have to replace it everywhere.
 
 *0.1a - First version increase! Has super basic functionality*
 
