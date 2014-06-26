@@ -70,3 +70,8 @@ Screenshots
 ![First Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/main-5-19-2014.png "Main Screen")
 ![Editor Screen](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-6-15-2014.png "Editor Screen")
 ![Editor Screen Multi](https://github.com/dennmat/spritzup/raw/master/screenshots/editor-multiselect-6-16-2014.png "Editor Screen Multi Select")
+
+### Super Early Animation Preview
+Please note how early this feature is in dev. The preview is also blown up 500% right now. Will be dynamic later.
+
+![Animations V -0.1](https://github.com/dennmat/spritzup/raw/master/screenshots/early-animations.gif "Animations Preview")
