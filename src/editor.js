@@ -327,6 +327,9 @@ class Editor {
 
 		this.activeProject = proj;
 		this.reload();
+		
+		this.toolBar.setProject(this.activeProject); //Not sure if this is the best sport
+																	//Need to create method to handle all the project swapping
 	}
 
 	resetImage() {
@@ -395,6 +398,10 @@ class Editor {
 
 	updateDirty(project_id) {
 		var proj = this.getProjectById(project_id);
+		
+		if (proj === null) {
+			return;
+		}
 
 		if (proj.dirty) {
 			this.tabManager.markTabDirty(project_id);

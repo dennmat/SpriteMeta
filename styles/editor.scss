@@ -34,26 +34,6 @@ $black: #000;
 	border: 1px solid $deepSoftBlue;
 }
 
-ul.element-selector {
-	list-style-type: none;
-	
-	margin: 0;
-	padding: 0;
-	
-	width: 100%;
-	
-	li {
-		padding: 10px 15px;
-		background: #222;
-		color: #FAFAFA;
-		cursor: pointer;
-		
-		&.selected {
-			background: #555;
-		}
-	}
-}
-
 #editor {
 	position: relative;
 	height: 100%;
@@ -88,9 +68,7 @@ ul.element-selector {
 
 	.animation-tab {
 		.existing-animations {
-			overflow-y: auto;
-			max-height: 200px;
-			height: 200px;
+		
 		}
 
 		.selected-animation {
@@ -116,7 +94,12 @@ ul.element-selector {
 				position: relative;
 				margin: 20px auto;
 				
-				zoom: 500%;
+				/*zoom: 500%;*/
+			}
+			
+			.frame-options {
+				padding: 5px;
+				background: #777;
 			}
 		}
 	}
@@ -124,10 +107,12 @@ ul.element-selector {
 	.left-pane {
 		box-sizing: border-box;
 		float: left;
+		min-width: 255px;
 		width: 15%;
 		background: $dark;
-		min-height: 850px;
+		/*min-height: 850px;*/
 		height: 100%;
+		overflow-y: auto;
 		.section-label {
 			margin: 15px 0 10px;
 			font-size: 14px;
@@ -138,9 +123,9 @@ ul.element-selector {
 	.right-pane {
 		box-sizing: border-box;
 		float: left;
-		width: 85%;
+		width: 81%;
 		background: #CCC;
-		min-height: 850px;
+		/*min-height: 850px;*/
 		overflow: auto;
 		position: relative;
 		height: 100%;
@@ -148,8 +133,8 @@ ul.element-selector {
 
 	.blank {
 		position: absolute;
-		left: 50%;
-		top: 50%;
+		left: 36%;
+		top: 40%;
 	}
 
 	.status-bar {

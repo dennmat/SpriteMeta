@@ -24,8 +24,7 @@
 					<a href="#" class="button blue new-animation"><i class='icon-plus'></i>&nbsp;New Animation</a>
 				</div>
 				<div class="selected-animation" style="display: none;">
-					
-					<div class="frame-options">
+					<div class="animation-options">
 						<table>
 							<tr>
 								<td>Name: </td>
@@ -34,24 +33,35 @@
 						</table>
 						<div>Frames</div>
 						<div class="existing-frames">
-							<ul class="element-selector frame-selector">
-							</ul>
 						</div>
-						<div class="frame-options" style="display: none;">
-							<table>
-								<tr>
-									<td>Duration(ms): </td>
-									<td><input type="text" class="frame-duration" /></td>
-								</tr>
-								<tr>
-									<td>Sprite: </td>
-									<td class="frame-sprite-name"></td>
-								</tr>
-							</table>
+						<div class="single-select">
+							<div class="frame-options" style="display: none;">
+								<table>
+									<tr>
+										<td>Duration(ms): </td>
+										<td><input type="text" class="frame-duration" /></td>
+									</tr>
+									<tr>
+										<td>Sprite: </td>
+										<td class="frame-sprite-name"></td>
+									</tr>
+									<tr>
+										<td colspan="2">
+											<a href="#" class="button red frame-delete"><i class="icon-cross"></i>&nbsp;Delete Frame</a> 
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						<div class="multi-select" style="display: none;">
 						</div>
 						<a href="#" class="button green animation-preview" style="display: none;"><i class="icon-youtube-play"></i>&nbsp;Preview Animation</a>
+						<a href="#" class="button red stop-animation" style="display: none;"><i class="icon-minus"></i>&nbsp;Stop Animation</a>
 						<div class="preview-frame">
 							
+						</div>
+						<div>
+							<a href="#" class="button blue animation-done"><i class="icon-check"></i>&nbsp;Done</a>
 						</div>
 					</div>
 				</div>

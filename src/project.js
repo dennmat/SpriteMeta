@@ -49,7 +49,8 @@ class Project {
 			for (var sprite of data.sprites) {
 				var spriteObj = new Elements.Sprite(this, {
 					rect: new Utils.Rect().fromDict(sprite.rect),
-					name: sprite.name
+					name: sprite.name,
+					id: sprite.id
 				});
 				this.addSprite(spriteObj, false);
 			}
@@ -144,7 +145,17 @@ class Project {
 
 		return null;
 	}
-
+	
+	getAnimationById(id) {
+		for (var animation of this.animations) {
+			if (animation.id === id) {
+				return animation;
+			}
+		}
+		
+		return null;
+	}
+	
 	//Deprecated Clean This Up
 	getSpriteByUID(uid) {
 		for (var sprite of this.sprites) {
@@ -219,7 +230,8 @@ class Project {
 			editorInfo: this.serializeEditorInfo(),
 
 			groups: this.serializeGroups(),
-			sprites: this.serializeSprites()
+			sprites: this.serializeSprites(),
+			animations: this.serializeAnimations()
 		};
 	}
 

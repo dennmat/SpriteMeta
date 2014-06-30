@@ -44,7 +44,7 @@ class Animation {
 		}
 	}
 
-	addFrame(sprite, duration=500) {
+	addFrame(sprite, duration=50) {
 		//Duration in ms
 
 		if (sprite.rect.w > this.largestWidth) {
@@ -59,6 +59,20 @@ class Animation {
 			duration: duration,
 			sprite: sprite
 		});
+	}
+	
+	deleteFrame(id) {
+		var project = this.editor.activeProject;
+		
+		var frameIndex = 0;
+		for (var frame of this.frames) {
+			if (frame.sprite.id === id) {
+				break;
+			}
+			frameIndex++;
+		}
+		
+		this.frames.splice(frameIndex, 1);
 	}
 
 	play(renderTo) {
@@ -98,6 +112,12 @@ class Animation {
 			this.renderTo.css({
 				'background-position': -frame.sprite.rect.x + 'px ' + -frame.sprite.rect.y + 'px'
 			});
+		}
+	}
+	
+	clearAnimation() {
+		if (this.playInterval !== null) {
+			clearInterval(this.playInterval);
 		}
 	}
 

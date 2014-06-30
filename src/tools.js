@@ -89,7 +89,7 @@ class SpriteTool extends Tool {
 		}
 
 		if (sprites.length > 1) {
-			editor.clearFocus();
+			//editor.clearFocus();
 		} else if (spriteObj !== null) {
 			editor.focus(spriteObj);
 		}
