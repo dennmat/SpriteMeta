@@ -205,7 +205,7 @@ Sprite.delegate = function() {
 		sprite.project.deleteSprite(sprite);
 
 		Sprite.boundSprite = null;
-		sprite.project.editor.clearFocus();
+		sprite.project.editor.clearSelections();
 		sprite = null;
 	});
 
